@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { UserDto } from '@/api/types'
+import type { MfaMethod, UserDto } from '@/api/types'
 
 /*
   Everything sensitive lives here and only here, in memory.
@@ -11,11 +11,19 @@ import type { UserDto } from '@/api/types'
 // FR-06: lock after 15 minutes without activity
 export const IDLE_MINUTES = 15
 
+// between "password accepted" and "second factor accepted"
+export type PendingMfa = {
+  token: string
+  methods: MfaMethod[]
+  email: string
+  remember: boolean
+}
+
 type SessionState = {
   user: UserDto | null
   accessToken: string | null
   // set while the user is between password and second factor
-  mfaToken: string | null
+  mfa: PendingMfa | null
   // derived from the password; kept only until the private key is opened / sealed
   wrapKey: CryptoKey | null
   // unwrapped RSA private key, non-extractable. null = vault is locked
@@ -26,7 +34,7 @@ type SessionState = {
   setSession: (accessToken: string, user: UserDto) => void
   setAccessToken: (token: string | null) => void
   setUser: (user: UserDto) => void
-  setMfaToken: (token: string | null) => void
+  setMfa: (mfa: PendingMfa | null) => void
   setWrapKey: (key: CryptoKey | null) => void
   unlock: (privateKey: CryptoKey) => void
   touch: () => void
@@ -37,15 +45,15 @@ type SessionState = {
 export const useSession = create<SessionState>((set, get) => ({
   user: null,
   accessToken: null,
-  mfaToken: null,
+  mfa: null,
   wrapKey: null,
   privateKey: null,
   lockAt: null,
 
-  setSession: (accessToken, user) => set({ accessToken, user, mfaToken: null }),
+  setSession: (accessToken, user) => set({ accessToken, user, mfa: null }),
   setAccessToken: (accessToken) => set({ accessToken }),
   setUser: (user) => set({ user }),
-  setMfaToken: (mfaToken) => set({ mfaToken }),
+  setMfa: (mfa) => set({ mfa }),
   setWrapKey: (wrapKey) => set({ wrapKey }),
 
   // once the private key is open the wrap key isn't needed any more
@@ -63,7 +71,7 @@ export const useSession = create<SessionState>((set, get) => ({
     set({
       user: null,
       accessToken: null,
-      mfaToken: null,
+      mfa: null,
       wrapKey: null,
       privateKey: null,
       lockAt: null,

@@ -126,3 +126,9 @@ export async function rewrapWithNewPassword(
     pkcs8.fill(0)
   }
 }
+
+// step 1 of recovery: prove the words open the kit before asking for a new password
+export async function checkRecoveryKit(recoveryWords: string[], sealedRecoveryKeyB64: string) {
+  const pkcs8 = await openWithPhrase(recoveryWords, fromBase64(sealedRecoveryKeyB64))
+  pkcs8.fill(0)
+}

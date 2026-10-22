@@ -63,9 +63,10 @@ export default function RecoveryCodesPage() {
     setError(null)
     try {
       await mfaApi.confirmRecoveryCode(confirm.trim())
-      useSession.getState().setUser({ ...user, status: 'active', mfaEnabled: true })
       await acceptPendingInvite()
       toast('Your vault is ready.', 'ok')
+      // flipping the status lets the app routes in; the guard would redirect us anyway
+      useSession.getState().setUser({ ...user, status: 'active', mfaEnabled: true })
       navigate('/vaults', { replace: true })
     } catch (err) {
       setError(err instanceof ApiError && err.errors?.code ? err.errors.code[0] : errorMessage(err))

@@ -14,6 +14,11 @@ export function startSession(res: SessionResponse) {
   queryClient.setQueryData(meKeys.me, res.user)
 }
 
+// only allow in-app paths after sign in (no open redirects)
+export function safeNext(next: string | null) {
+  return next && next.startsWith('/') && !next.startsWith('//') ? next : '/vaults'
+}
+
 // where a user with this status belongs
 export function homeFor(user: UserDto) {
   if (user.status === 'pendingKeys') return '/setup/keys'
