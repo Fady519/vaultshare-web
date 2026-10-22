@@ -1,0 +1,14 @@
+node_modules
+dist
+*.local
+.env.local
+.env.*.local
+
+*.log
+npm-debug.log*
+
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
