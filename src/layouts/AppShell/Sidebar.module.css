@@ -1,0 +1,146 @@
+.rail {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--surface);
+  border-right: 1px solid var(--rule);
+  overflow-y: auto;
+}
+
+.logo {
+  padding: 26px 24px 32px;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 12px;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: var(--radius-control);
+  font: var(--type-body-sm);
+  color: var(--muted);
+}
+
+.link svg {
+  color: var(--faint);
+}
+
+.link:hover {
+  color: var(--text);
+}
+
+.active {
+  background: var(--raised);
+  color: var(--text);
+  font-weight: 500;
+}
+
+.active svg {
+  color: var(--accent);
+}
+
+.section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 34px 24px 8px;
+}
+
+.sectionTitle {
+  font: var(--type-label);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.add {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: var(--radius-control);
+  color: var(--faint);
+}
+
+.add:hover {
+  color: var(--accent);
+  background: var(--raised);
+}
+
+.vaults {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 12px;
+}
+
+.vault {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-control);
+  font: var(--type-body-sm);
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.vault:hover {
+  color: var(--text);
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: var(--radius-control);
+  background: var(--faint);
+}
+
+.vaultActive {
+  background: var(--raised);
+  color: var(--text);
+  font-weight: 500;
+}
+
+.vaultActive .dot {
+  background: var(--accent);
+}
+
+.vaultName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.count {
+  font: var(--type-data-sm);
+  color: var(--faint);
+}
+
+.vaultSkeleton {
+  padding: 11px 12px;
+}
+
+.error {
+  padding: 8px 12px;
+  font: var(--type-micro);
+  color: var(--danger);
+}
+
+.footer {
+  margin: auto 24px 0;
+  padding: 20px 0 24px;
+  border-top: 1px solid var(--rule-soft);
+}

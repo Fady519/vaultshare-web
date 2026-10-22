@@ -1,0 +1,76 @@
+.wrap {
+  position: relative;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 4px;
+  margin: -4px;
+  border-radius: var(--radius-control);
+  text-align: left;
+}
+
+button.trigger:hover {
+  background: var(--raised);
+}
+
+.who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.name {
+  font: var(--type-body-sm);
+  font-size: 0.78125rem;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meta {
+  font: var(--type-data-sm);
+  font-size: 0.59375rem;
+  color: var(--faint);
+  white-space: pre;
+  text-transform: capitalize;
+}
+
+.menu {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: -4px;
+  right: -4px;
+  z-index: 20;
+  padding: 6px;
+  background: var(--raised);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-overlay);
+}
+
+.menu a {
+  display: block;
+  padding: 7px 10px;
+  border-radius: var(--radius-control);
+  font: var(--type-body-sm);
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.menu a:hover,
+.menu a:focus-visible {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.sep {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--rule);
+}

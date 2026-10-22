@@ -1,0 +1,36 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 9px;
+  border: 1px solid;
+  border-radius: var(--radius-control);
+  font: var(--type-label);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.unlocked {
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+  color: var(--accent);
+}
+
+.locked {
+  background: var(--raised);
+  border-color: var(--rule);
+  color: var(--muted);
+}
+
+.soon {
+  background: var(--warn-soft);
+  border-color: var(--warn);
+  color: var(--warn);
+}
+
+.time {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
+}

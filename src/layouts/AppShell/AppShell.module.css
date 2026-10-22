@@ -1,0 +1,36 @@
+.shell {
+  display: grid;
+  grid-template-columns: var(--rail-w) minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.main {
+  flex: 1;
+  outline: none;
+}
+
+.content {
+  max-width: calc(var(--content-max) + 2 * var(--s-40));
+  padding: 0 var(--s-40) var(--s-64);
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 8px;
+  z-index: 200;
+  padding: 8px 12px;
+  background: var(--accent);
+  color: var(--on-accent);
+  border-radius: var(--radius-control);
+}
+
+.skip:focus {
+  left: 8px;
+}
