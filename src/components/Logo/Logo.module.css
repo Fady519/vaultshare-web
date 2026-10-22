@@ -1,0 +1,40 @@
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--text);
+}
+
+.mark {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 18px;
+}
+
+.mark i {
+  display: block;
+  width: 3px;
+  height: 18px;
+  background: var(--text);
+}
+
+.mark i:first-child {
+  width: 7px;
+  background: var(--accent);
+}
+
+.mark i:last-child {
+  height: 12px;
+  opacity: 0.5;
+}
+
+.name {
+  font: var(--type-h3);
+  font-weight: 700;
+  letter-spacing: var(--ls-h3);
+}
+
+.logo[data-size='lg'] .name {
+  font-size: 1.25rem;
+}
