@@ -102,6 +102,9 @@ export type RegisterRequest = {
   verifier: Base64
 }
 
+// the server emails a 6-digit code (valid 10 min) after /auth/register
+export type VerifyEmailRequest = { email: string; code: string }
+
 export type SessionResponse = { accessToken: string; expiresIn: number; user: UserDto }
 
 export type LoginRequest = { email: string; verifier: Base64; rememberDevice: boolean }
@@ -112,7 +115,12 @@ export type LoginResponse =
 
 export type MfaMethod = 'totp' | 'webauthn' | 'recovery'
 
-export type LoginMfaRequest = { mfaToken: string; method: 'totp' | 'recovery'; code: string }
+export type LoginMfaRequest = {
+  mfaToken: string
+  method: 'totp' | 'recovery'
+  code: string
+  rememberDevice?: boolean
+}
 
 export type RefreshResponse = { accessToken: string; expiresIn: number }
 
@@ -234,6 +242,8 @@ export type InvitationPreviewDto = {
   inviterName: string
   inviterEmail: string
   expiresAt: IsoDate
+  fileCount: number
+  memberCount: number
 }
 
 export type PendingGrantDto = {

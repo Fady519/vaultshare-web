@@ -8,11 +8,16 @@ import type { UserDto } from '@/api/types'
   needs the password again.
 */
 
+// FR-06: lock after 15 minutes without activity
+export const IDLE_MINUTES = 15
+
 type SessionState = {
   user: UserDto | null
   accessToken: string | null
   // set while the user is between password and second factor
   mfaToken: string | null
+  // derived from the password; kept only until the private key is opened / sealed
+  wrapKey: CryptoKey | null
   // unwrapped RSA private key, non-extractable. null = vault is locked
   privateKey: CryptoKey | null
   // epoch ms when the idle lock kicks in
@@ -22,8 +27,9 @@ type SessionState = {
   setAccessToken: (token: string | null) => void
   setUser: (user: UserDto) => void
   setMfaToken: (token: string | null) => void
-  unlock: (privateKey: CryptoKey, idleMinutes: number) => void
-  touch: (idleMinutes: number) => void
+  setWrapKey: (key: CryptoKey | null) => void
+  unlock: (privateKey: CryptoKey) => void
+  touch: () => void
   lock: () => void
   clear: () => void
 }
@@ -32,6 +38,7 @@ export const useSession = create<SessionState>((set, get) => ({
   user: null,
   accessToken: null,
   mfaToken: null,
+  wrapKey: null,
   privateKey: null,
   lockAt: null,
 
@@ -39,19 +46,28 @@ export const useSession = create<SessionState>((set, get) => ({
   setAccessToken: (accessToken) => set({ accessToken }),
   setUser: (user) => set({ user }),
   setMfaToken: (mfaToken) => set({ mfaToken }),
+  setWrapKey: (wrapKey) => set({ wrapKey }),
 
-  unlock: (privateKey, idleMinutes) =>
-    set({ privateKey, lockAt: Date.now() + idleMinutes * 60_000 }),
+  // once the private key is open the wrap key isn't needed any more
+  unlock: (privateKey) =>
+    set({ privateKey, wrapKey: null, lockAt: Date.now() + IDLE_MINUTES * 60_000 }),
 
-  touch: (idleMinutes) => {
-    if (get().privateKey) set({ lockAt: Date.now() + idleMinutes * 60_000 })
+  touch: () => {
+    if (get().privateKey) set({ lockAt: Date.now() + IDLE_MINUTES * 60_000 })
   },
 
-  // drop the key reference so it can be garbage collected
-  lock: () => set({ privateKey: null, lockAt: null }),
+  // drop the key references so they can be garbage collected
+  lock: () => set({ privateKey: null, wrapKey: null, lockAt: null }),
 
   clear: () =>
-    set({ user: null, accessToken: null, mfaToken: null, privateKey: null, lockAt: null }),
+    set({
+      user: null,
+      accessToken: null,
+      mfaToken: null,
+      wrapKey: null,
+      privateKey: null,
+      lockAt: null,
+    }),
 }))
 
 export const isUnlocked = () => useSession.getState().privateKey !== null
