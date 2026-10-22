@@ -116,8 +116,9 @@ async function request<T>(method: string, path: string, opts: RequestOptions = {
   }
 
   if (res.ok) {
-    if (res.status === 204) return undefined as T
-    return (await res.json()) as T
+    // 202 / 204 come back with no body
+    const text = await res.text()
+    return (text ? JSON.parse(text) : undefined) as T
   }
 
   const problem = await toProblem(res)
