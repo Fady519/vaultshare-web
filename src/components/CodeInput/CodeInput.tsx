@@ -35,11 +35,12 @@ export function CodeInput({
     return clean
   }
 
-  function setDigit(i: number, d: string) {
-    const arr = value.split('')
-    arr[i] = d
-    const clean = update(arr.join(''))
-    refs.current[Math.min(clean.length, length - 1)]?.focus()
+  // writes digits starting at box i. one key = one digit, but autofill or a
+  // fast typist can deliver several in a single input event
+  function fillFrom(i: number, chars: string) {
+    const next = value.slice(0, i) + chars + value.slice(i + chars.length)
+    update(next)
+    refs.current[Math.min(i + chars.length, length - 1)]?.focus()
   }
 
   function onKeyDown(i: number, e: KeyboardEvent<HTMLInputElement>) {
@@ -73,14 +74,18 @@ export function CodeInput({
           className={cx(styles.box, d.trim() && styles.filled, error && styles.error)}
           inputMode="numeric"
           autoComplete={i === 0 ? 'one-time-code' : 'off'}
-          maxLength={1}
           aria-label={`Digit ${i + 1} of ${length}`}
           value={d.trim()}
           disabled={disabled}
           autoFocus={autoFocus && i === 0}
           onChange={(e) => {
-            const v = e.target.value.replace(/\D/g, '')
-            if (v) setDigit(i, v[v.length - 1])
+            const typed = e.target.value.replace(/\D/g, '')
+            if (!typed) return
+            // the box already held a digit: keep only what was just typed
+            const current = d.trim()
+            const chars =
+              current && typed.length > 1 && typed.startsWith(current) ? typed.slice(1) : typed
+            fillFrom(i, chars.slice(0, length - i))
           }}
           onKeyDown={(e) => onKeyDown(i, e)}
           onPaste={onPaste}
