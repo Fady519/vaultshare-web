@@ -52,6 +52,17 @@
   font: var(--type-data-sm);
 }
 
+.reason {
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--code-bg);
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--radius-control);
+  font: var(--type-data-sm);
+  color: var(--muted);
+  white-space: pre-wrap;
+}
+
 .button {
   align-self: flex-start;
   height: 40px;

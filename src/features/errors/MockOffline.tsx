@@ -1,7 +1,7 @@
 import styles from './MockOffline.module.css'
 
 // shown instead of the app when VITE_USE_MOCKS is on but the mock service worker isn't answering
-export function MockOffline() {
+export function MockOffline({ reason }: { reason?: string }) {
   const origin = window.location.origin
 
   return (
@@ -24,8 +24,13 @@ export function MockOffline() {
             DevTools → Application → Service workers, click <em>Unregister</em> on anything that
             isn&apos;t <code>mockServiceWorker.js</code>, and make sure “Bypass for network” is off.
           </li>
+          <li>
+            If you just restarted <code>npm run dev</code>, wait until it prints the address, then
+            reload.
+          </li>
           <li>Close other tabs on this address, then reload.</li>
         </ol>
+        {reason && <pre className={styles.reason}>{reason}</pre>}
         <button type="button" className={styles.button} onClick={() => window.location.reload()}>
           Reload
         </button>

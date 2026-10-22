@@ -14,16 +14,16 @@ async function start() {
   // fake backend until the real one is ready (VITE_USE_MOCKS in .env)
   if (import.meta.env.VITE_USE_MOCKS === 'true') {
     const { startMocks } = await import('./mocks/browser')
-    const answering = await startMocks()
+    const mocks = await startMocks()
 
-    if (!answering) {
+    if (!mocks.ok) {
       // one normal reload usually hands the tab to the service worker
       if (!sessionStorage.getItem(RELOAD_KEY)) {
         sessionStorage.setItem(RELOAD_KEY, '1')
         window.location.reload()
         return
       }
-      root.render(<MockOffline />)
+      root.render(<MockOffline reason={mocks.reason} />)
       return
     }
     sessionStorage.removeItem(RELOAD_KEY)

@@ -2,12 +2,20 @@ import { setupWorker } from 'msw/browser'
 import { initDb } from './db'
 import { handlers } from './handlers'
 
-// resolves to false when the mock service worker isn't the one answering this tab
-export async function startMocks() {
-  await initDb()
-  const worker = setupWorker(...handlers)
-  await worker.start({ onUnhandledRequest: 'bypass', quiet: true })
-  return mockIsAnswering()
+export type MockStart = { ok: true } | { ok: false; reason: string }
+
+export async function startMocks(): Promise<MockStart> {
+  try {
+    await initDb()
+    const worker = setupWorker(...handlers)
+    await worker.start({ onUnhandledRequest: 'bypass', quiet: true })
+  } catch (err) {
+    // e.g. the worker script couldn't be fetched while the dev server was restarting
+    return { ok: false, reason: (err as Error).message }
+  }
+  return (await mockIsAnswering())
+    ? { ok: true }
+    : { ok: false, reason: 'The service worker started but is not answering this tab.' }
 }
 
 /*
