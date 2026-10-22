@@ -61,7 +61,7 @@ export default function SignUpPage() {
         saltWrap: secrets.saltWrap,
         verifier: secrets.verifier,
       })
-      useSession.getState().setWrapKey(secrets.wrapKey)
+      useSession.getState().setWrapKey(secrets.wrapKey, secrets.saltWrap)
       setPendingEmail(shownEmail.trim().toLowerCase())
       if (inviteToken) rememberInvite(inviteToken)
       navigate('/verify-email')

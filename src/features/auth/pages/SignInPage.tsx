@@ -37,7 +37,7 @@ export default function SignInPage() {
         rememberDevice: remember,
       })
       const store = useSession.getState()
-      store.setWrapKey(secrets.wrapKey)
+      store.setWrapKey(secrets.wrapKey, pre.saltWrap)
 
       if (res.mfaRequired) {
         store.setMfa({ token: res.mfaToken, methods: res.methods, email: email.trim(), remember })

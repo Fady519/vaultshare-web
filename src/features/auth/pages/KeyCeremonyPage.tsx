@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Button,
@@ -51,6 +51,19 @@ export default function KeyCeremonyPage() {
 
   const running = rows !== null && !fingerprint && !error
 
+  // sealing with a key the server can't re-derive would lock the account forever,
+  // so make sure the salts we derived with are still the account's salts
+  useEffect(() => {
+    const { wrapKey: key, wrapSalt } = useSession.getState()
+    if (!key || !user) return
+    authApi
+      .prelogin(user.email)
+      .then((pre) => {
+        if (pre.saltWrap !== wrapSalt) useSession.getState().setWrapKey(null)
+      })
+      .catch(() => {})
+  }, [user])
+
   // opened the email link in another tab: the wrap key from sign-up isn't in this tab
   async function confirmPassword(e: FormEvent) {
     e.preventDefault()
@@ -62,7 +75,7 @@ export default function KeyCeremonyPage() {
       const secrets = await passwordSecrets(password, pre.saltAuth, pre.saltWrap, pre.kdf)
       // the server confirms it's the same password by checking the verifier
       await authApi.login({ email: user.email, verifier: secrets.verifier, rememberDevice: false })
-      useSession.getState().setWrapKey(secrets.wrapKey)
+      useSession.getState().setWrapKey(secrets.wrapKey, pre.saltWrap)
       setPassword('')
     } catch (err) {
       setPwError(

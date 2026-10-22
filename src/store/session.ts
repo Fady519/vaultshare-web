@@ -26,6 +26,8 @@ type SessionState = {
   mfa: PendingMfa | null
   // derived from the password; kept only until the private key is opened / sealed
   wrapKey: CryptoKey | null
+  // the salt it was derived with, to notice if the server's salts changed meanwhile
+  wrapSalt: string | null
   // unwrapped RSA private key, non-extractable. null = vault is locked
   privateKey: CryptoKey | null
   // epoch ms when the idle lock kicks in
@@ -35,7 +37,7 @@ type SessionState = {
   setAccessToken: (token: string | null) => void
   setUser: (user: UserDto) => void
   setMfa: (mfa: PendingMfa | null) => void
-  setWrapKey: (key: CryptoKey | null) => void
+  setWrapKey: (key: CryptoKey | null, saltWrap?: string | null) => void
   unlock: (privateKey: CryptoKey) => void
   touch: () => void
   lock: () => void
@@ -47,6 +49,7 @@ export const useSession = create<SessionState>((set, get) => ({
   accessToken: null,
   mfa: null,
   wrapKey: null,
+  wrapSalt: null,
   privateKey: null,
   lockAt: null,
 
@@ -54,18 +57,18 @@ export const useSession = create<SessionState>((set, get) => ({
   setAccessToken: (accessToken) => set({ accessToken }),
   setUser: (user) => set({ user }),
   setMfa: (mfa) => set({ mfa }),
-  setWrapKey: (wrapKey) => set({ wrapKey }),
+  setWrapKey: (wrapKey, saltWrap = null) => set({ wrapKey, wrapSalt: wrapKey ? saltWrap : null }),
 
   // once the private key is open the wrap key isn't needed any more
   unlock: (privateKey) =>
-    set({ privateKey, wrapKey: null, lockAt: Date.now() + IDLE_MINUTES * 60_000 }),
+    set({ privateKey, wrapKey: null, wrapSalt: null, lockAt: Date.now() + IDLE_MINUTES * 60_000 }),
 
   touch: () => {
     if (get().privateKey) set({ lockAt: Date.now() + IDLE_MINUTES * 60_000 })
   },
 
   // drop the key references so they can be garbage collected
-  lock: () => set({ privateKey: null, wrapKey: null, lockAt: null }),
+  lock: () => set({ privateKey: null, wrapKey: null, wrapSalt: null, lockAt: null }),
 
   clear: () =>
     set({
@@ -73,6 +76,7 @@ export const useSession = create<SessionState>((set, get) => ({
       accessToken: null,
       mfa: null,
       wrapKey: null,
+      wrapSalt: null,
       privateKey: null,
       lockAt: null,
     }),

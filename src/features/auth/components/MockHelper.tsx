@@ -21,7 +21,11 @@ export function MockInbox({
   useEffect(() => {
     if (!mocksOn || !email) return
     let alive = true
-    const poll = () => fetchOutbox(email).then((list) => alive && setMail(list[0] ?? null))
+    // the newest mail that carries a code or a link is the useful one
+    const poll = () =>
+      fetchOutbox(email).then(
+        (list) => alive && setMail(list.find((m) => m.code || m.link) ?? list[0] ?? null),
+      )
     poll()
     const t = setInterval(poll, 2000)
     return () => {

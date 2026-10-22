@@ -143,7 +143,14 @@ export const authHandlers = [
     const email = body.email.trim().toLowerCase()
     const existing = findUserByEmail(email)
 
-    if (existing) {
+    if (existing && !existing.emailVerified) {
+      // never verified = nothing in it yet: the latest sign-up attempt wins
+      existing.displayName = body.displayName.trim()
+      existing.saltAuth = body.saltAuth
+      existing.saltWrap = body.saltWrap
+      existing.verifierHash = await hashVerifier(body.verifier)
+      await sendVerifyCode(email)
+    } else if (existing) {
       // same answer as a new account. the owner of the address gets told instead
       sendMail(
         email,
