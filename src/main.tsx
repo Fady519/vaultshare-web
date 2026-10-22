@@ -8,8 +8,8 @@ import './styles/base.css'
 async function start() {
   // fake backend until the real one is ready (VITE_USE_MOCKS in .env)
   if (import.meta.env.VITE_USE_MOCKS === 'true') {
-    const { worker } = await import('./mocks/browser')
-    await worker.start({ onUnhandledRequest: 'bypass', quiet: true })
+    const { startMocks } = await import('./mocks/browser')
+    await startMocks()
   }
 
   createRoot(document.getElementById('root')!).render(

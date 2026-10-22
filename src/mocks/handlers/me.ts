@@ -1,7 +1,7 @@
 import { delay, http, HttpResponse } from 'msw'
 import type { UserDto } from '@/api/types'
-import { save, type MockUser } from '../db'
-import { API, currentUser, problem, unauthorized } from './utils'
+import { db, save, type MockUser } from '../db'
+import { API, authenticate, problem } from './utils'
 
 export function toUserDto(u: MockUser): UserDto {
   return {
@@ -13,7 +13,7 @@ export function toUserDto(u: MockUser): UserDto {
     status: u.status,
     systemRole: u.systemRole,
     keyVersion: u.keyVersion,
-    mfaEnabled: u.mfaEnabled,
+    mfaEnabled: db.factors.some((f) => f.userId === u.id && f.confirmed),
     createdAt: u.createdAt,
   }
 }
@@ -21,15 +21,16 @@ export function toUserDto(u: MockUser): UserDto {
 export const meHandlers = [
   http.get(`${API}/me`, async ({ request }) => {
     await delay()
-    const user = currentUser(request)
-    if (!user) return unauthorized()
-    return HttpResponse.json(toUserDto(user))
+    const auth = authenticate(request, { onboarding: true })
+    if (auth.error) return auth.error
+    return HttpResponse.json(toUserDto(auth.user))
   }),
 
   http.patch(`${API}/me`, async ({ request }) => {
     await delay()
-    const user = currentUser(request)
-    if (!user) return unauthorized()
+    const auth = authenticate(request)
+    if (auth.error) return auth.error
+    const user = auth.user
 
     const body = (await request.json()) as { displayName?: string; locale?: string }
     if (body.displayName !== undefined) {

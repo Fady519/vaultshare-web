@@ -1,7 +1,7 @@
 import { delay, http, HttpResponse } from 'msw'
 import type { CreateVaultRequest, MemberDto, VaultDto, VaultRole } from '@/api/types'
 import { db, save, type MockVault } from '../db'
-import { API, currentUser, newId, now, problem, unauthorized } from './utils'
+import { API, authenticate, newId, now, problem } from './utils'
 
 function roleOf(vaultId: string, userId: string) {
   return db.members.find((m) => m.vaultId === vaultId && m.userId === userId)?.role
@@ -27,8 +27,9 @@ const canManage = (role?: VaultRole) => role === 'owner' || role === 'manager'
 export const vaultHandlers = [
   http.get(`${API}/vaults`, async ({ request }) => {
     await delay()
-    const user = currentUser(request)
-    if (!user) return unauthorized()
+    const auth = authenticate(request)
+    if (auth.error) return auth.error
+    const user = auth.user
 
     const mine = db.vaults.filter((v) => roleOf(v.id, user.id))
     return HttpResponse.json(mine.map((v) => toVaultDto(v, user.id)))
@@ -36,8 +37,9 @@ export const vaultHandlers = [
 
   http.post(`${API}/vaults`, async ({ request }) => {
     await delay()
-    const user = currentUser(request)
-    if (!user) return unauthorized()
+    const auth = authenticate(request)
+    if (auth.error) return auth.error
+    const user = auth.user
 
     const body = (await request.json()) as CreateVaultRequest
     const name = body.name?.trim() ?? ''
@@ -83,8 +85,9 @@ export const vaultHandlers = [
 
   http.get(`${API}/vaults/:vaultId`, async ({ request, params }) => {
     await delay()
-    const user = currentUser(request)
-    if (!user) return unauthorized()
+    const auth = authenticate(request)
+    if (auth.error) return auth.error
+    const user = auth.user
 
     const vault = db.vaults.find((v) => v.id === params.vaultId)
     if (!vault || !roleOf(vault.id, user.id)) return problem(404, 'NOT_FOUND', 'Vault not found.')
@@ -93,8 +96,9 @@ export const vaultHandlers = [
 
   http.patch(`${API}/vaults/:vaultId`, async ({ request, params }) => {
     await delay()
-    const user = currentUser(request)
-    if (!user) return unauthorized()
+    const auth = authenticate(request)
+    if (auth.error) return auth.error
+    const user = auth.user
 
     const vault = db.vaults.find((v) => v.id === params.vaultId)
     if (!vault) return problem(404, 'NOT_FOUND', 'Vault not found.')
@@ -111,8 +115,9 @@ export const vaultHandlers = [
 
   http.get(`${API}/vaults/:vaultId/members`, async ({ request, params }) => {
     await delay()
-    const user = currentUser(request)
-    if (!user) return unauthorized()
+    const auth = authenticate(request)
+    if (auth.error) return auth.error
+    const user = auth.user
     if (!roleOf(String(params.vaultId), user.id))
       return problem(404, 'NOT_FOUND', 'Vault not found.')
 

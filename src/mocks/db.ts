@@ -1,4 +1,4 @@
-import type { SystemRole, UserStatus, VaultRole } from '@/api/types'
+import type { AuditAction, AuditEntryDto, SystemRole, UserStatus, VaultRole } from '@/api/types'
 import { seed } from './seed'
 
 /*
@@ -14,20 +14,21 @@ export type MockUser = {
   avatarUrl: string | null
   locale: string
   status: UserStatus
+  emailVerified: boolean
   systemRole: SystemRole
   createdAt: string
-  // auth (stored as the server would: opaque base64)
+  lastActiveAt: string | null
+  // what a real server keeps: salts + a hash of the verifier, never the password
   saltAuth: string
   saltWrap: string
-  verifier: string
-  // keys
+  verifierHash: string
+  // opaque blobs from the key ceremony
   publicKey: string
   sealedPrivateKey: string
   sealedRecoveryKey: string
   keyVersion: number
   fingerprint: string
   keysCreatedAt: string | null
-  mfaEnabled: boolean
   idleLockMinutes: number
 }
 
@@ -47,23 +48,99 @@ export type MockMember = {
   joinedAt: string
 }
 
-export type MockToken = {
+export type MockAccessToken = { token: string; userId: string; expiresAt: number }
+
+export type MockRefreshToken = {
   token: string
   userId: string
+  familyId: string
+  usedAt: string | null
+  createdAt: string
   expiresAt: number
+  userAgent: string
+  remember: boolean
 }
+
+export type MockMfaToken = { token: string; userId: string; expiresAt: number }
+
+export type MockFactor = {
+  id: string
+  userId: string
+  type: 'totp' | 'webauthn'
+  label: string
+  secret: string | null
+  credentialId: string | null
+  confirmed: boolean
+  createdAt: string
+  lastUsedAt: string | null
+}
+
+export type MockRecoveryCode = { userId: string; hash: string; usedAt: string | null }
+
+export type MockEmailCode = { email: string; hash: string; expiresAt: number; sentAt: number }
+
+export type MockRecoveryToken = {
+  token: string
+  userId: string
+  mode: 'kit' | 'reset'
+  expiresAt: number
+  usedAt: string | null
+  challenge: string | null
+}
+
+export type MockChallenge = { key: string; challenge: string; expiresAt: number }
+
+export type MockStepUp = { token: string; userId: string; action: string; expiresAt: number }
+
+export type MockInvitation = {
+  id: string
+  token: string
+  email: string
+  vaultId: string
+  role: VaultRole
+  invitedBy: string
+  status: 'pending' | 'accepted' | 'expired'
+  createdAt: string
+  expiresAt: string
+}
+
+// mails the server "sent". shown in the dev inbox panel, there is no SMTP here
+export type MockMail = {
+  id: string
+  to: string
+  subject: string
+  body: string
+  code: string | null
+  link: string | null
+  createdAt: string
+}
+
+export type MockAudit = Omit<AuditEntryDto, 'actorName'> & { action: AuditAction }
 
 export type MockDb = {
   version: number
   users: MockUser[]
   vaults: MockVault[]
   members: MockMember[]
-  accessTokens: MockToken[]
+  accessTokens: MockAccessToken[]
+  refreshTokens: MockRefreshToken[]
+  mfaTokens: MockMfaToken[]
+  factors: MockFactor[]
+  recoveryCodes: MockRecoveryCode[]
+  emailCodes: MockEmailCode[]
+  recoveryTokens: MockRecoveryToken[]
+  challenges: MockChallenge[]
+  stepUps: MockStepUp[]
+  invitations: MockInvitation[]
+  outbox: MockMail[]
+  audit: MockAudit[]
 }
 
 // bump when the shape changes, old local data gets reseeded
-const DB_VERSION = 1
+const DB_VERSION = 2
 const STORAGE_KEY = 'vaultshare.mock-db'
+
+export let db = {} as MockDb
 
 function load(): MockDb | null {
   try {
@@ -76,7 +153,10 @@ function load(): MockDb | null {
   }
 }
 
-export const db: MockDb = load() ?? { version: DB_VERSION, ...seed() }
+export async function initDb() {
+  db = load() ?? { version: DB_VERSION, ...(await seed()) }
+  save()
+}
 
 export function save() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(db))
@@ -84,7 +164,6 @@ export function save() {
 
 export function resetMockDb() {
   localStorage.removeItem(STORAGE_KEY)
-  window.location.reload()
+  document.cookie = 'vs_refresh=; Path=/; Max-Age=0'
+  window.location.href = '/'
 }
-
-save()

@@ -1,5 +1,18 @@
+import { authHandlers } from './auth'
+import { devHandlers } from './dev'
+import { invitationHandlers } from './invitations'
+import { keyHandlers } from './keys'
 import { meHandlers } from './me'
+import { mfaHandlers } from './mfa'
 import { vaultHandlers } from './vaults'
 
 // one file per area of the API, same split as src/api
-export const handlers = [...meHandlers, ...vaultHandlers]
+export const handlers = [
+  ...authHandlers,
+  ...keyHandlers,
+  ...mfaHandlers,
+  ...meHandlers,
+  ...vaultHandlers,
+  ...invitationHandlers,
+  ...devHandlers,
+]
