@@ -39,8 +39,11 @@ export async function rsaEncrypt(publicKey: CryptoKey, data: Uint8Array) {
 export async function rsaDecrypt(privateKey: CryptoKey, data: Uint8Array) {
   try {
     return new Uint8Array(await crypto.subtle.decrypt({ name: 'RSA-OAEP' }, privateKey, buf(data)))
-  } catch {
-    throw new DecryptError('This key cannot open that envelope')
+  } catch (err) {
+    if (err instanceof DOMException && err.name === 'OperationError') {
+      throw new DecryptError('This key cannot open that envelope')
+    }
+    throw err
   }
 }
 

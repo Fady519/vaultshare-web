@@ -3,6 +3,7 @@ import { wordlist } from '@scure/bip39/wordlists/english'
 import { argon2id, hkdfAesKey } from './kdf'
 import { buf, concatBytes, randomBytes } from './encoding'
 import { DecryptError } from './errors'
+import { asDecryptError } from './seal'
 import { BLOB_VERSION, INFO, IV_BYTES, KDF, SALT_BYTES } from './params'
 
 /*
@@ -60,7 +61,7 @@ export async function openWithPhrase(words: string[] | string, blob: Uint8Array)
   const key = await recoveryKey(words, salt)
   try {
     return new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ct))
-  } catch {
-    throw new DecryptError('These words do not open this recovery kit')
+  } catch (err) {
+    throw asDecryptError(err, 'These words do not open this recovery kit')
   }
 }
