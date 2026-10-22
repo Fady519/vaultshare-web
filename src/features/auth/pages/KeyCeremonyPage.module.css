@@ -1,0 +1,79 @@
+.cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  background: var(--raised);
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--radius-control);
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: var(--type-h3);
+  font-size: 0.9375rem;
+}
+
+.cardText {
+  font: var(--type-micro);
+  color: var(--muted);
+}
+
+.cardMeta {
+  margin-top: 8px;
+  font: var(--type-data-sm);
+  color: var(--accent);
+}
+
+.pine {
+  color: var(--accent);
+}
+
+.amber {
+  color: var(--warn);
+}
+
+.password {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 600px;
+}
+
+.password > :first-child {
+  flex: 1;
+}
+
+.password button {
+  margin-top: 24px;
+  height: 44px;
+}
+
+.kitText {
+  margin-top: 4px;
+  font: var(--type-body-sm);
+  color: var(--muted);
+}
+
+@media (max-width: 639px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .password {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .password button {
+    margin-top: 0;
+  }
+}

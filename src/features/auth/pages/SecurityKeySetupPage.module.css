@@ -1,0 +1,54 @@
+.stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 44px 20px 24px;
+  background: var(--code-bg);
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--radius-control);
+  background-image:
+    radial-gradient(circle, transparent 59px, var(--rule-soft) 60px, transparent 61px),
+    radial-gradient(circle, transparent 89px, var(--rule-soft) 90px, transparent 91px);
+  background-position: center 74px;
+  background-repeat: no-repeat;
+  background-size: 240px 240px;
+}
+
+.ring {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 20px;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.ok {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.pulse .ring {
+  animation: pulse 1.6s var(--ease) infinite;
+}
+
+.stageTitle {
+  font: var(--type-body-sm);
+  font-weight: 600;
+}
+
+.stageSub {
+  font: var(--type-micro);
+  color: var(--muted);
+}
+
+@keyframes pulse {
+  50% {
+    box-shadow: 0 0 0 12px rgba(87, 199, 158, 0.08);
+  }
+}

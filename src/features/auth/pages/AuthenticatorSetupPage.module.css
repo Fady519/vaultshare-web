@@ -1,0 +1,74 @@
+.pair {
+  display: flex;
+  gap: 36px;
+}
+
+.qr {
+  flex: none;
+  padding: 0;
+  background: #fff;
+  border-radius: var(--radius-control);
+  line-height: 0;
+}
+
+.manual {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding-top: 6px;
+}
+
+.scanTitle {
+  font: var(--type-h3);
+  font-size: 0.9375rem;
+}
+
+.scanText {
+  margin-bottom: 18px;
+  font: var(--type-body-sm);
+  color: var(--muted);
+}
+
+.secret {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 42px;
+  padding: 0 14px;
+  background: var(--raised);
+  border-radius: var(--radius-control);
+}
+
+.secret code {
+  font: var(--type-data);
+  letter-spacing: 1px;
+  color: var(--accent);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.secret button {
+  font: var(--type-micro);
+  color: var(--muted);
+}
+
+.secret button:hover {
+  color: var(--text);
+}
+
+.refresh {
+  margin-left: 16px;
+  font: var(--type-body-sm);
+  color: var(--faint);
+}
+
+@media (max-width: 639px) {
+  .pair {
+    flex-direction: column;
+    gap: 20px;
+  }
+}

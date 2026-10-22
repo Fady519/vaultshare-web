@@ -1,0 +1,33 @@
+.codes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 16px;
+}
+
+.codes li {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  height: 46px;
+  padding: 0 14px;
+  background: var(--raised);
+  border-radius: var(--radius-control);
+}
+
+.n {
+  font: var(--type-data-sm);
+  color: var(--faint);
+}
+
+.codes code {
+  font: var(--type-data);
+  font-size: 0.8125rem;
+  letter-spacing: 1px;
+  color: var(--text);
+}
+
+@media (max-width: 639px) {
+  .codes {
+    grid-template-columns: 1fr;
+  }
+}
