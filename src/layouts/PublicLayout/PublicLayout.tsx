@@ -3,10 +3,9 @@ import { Button, Logo } from '@/components'
 import styles from './PublicLayout.module.css'
 
 const NAV = [
+  { href: '#difference', label: 'The difference' },
   { href: '#how', label: 'How it works' },
-  { href: '#crypto', label: 'Cryptography' },
-  { href: '#access', label: 'Access control' },
-  { href: '#audit', label: 'Audit' },
+  { href: '#compare', label: 'Compared' },
 ]
 
 // marketing pages use the light "paper" theme

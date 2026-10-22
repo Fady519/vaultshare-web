@@ -1,0 +1,32 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 40px;
+  padding: 0 12px;
+  background: var(--raised);
+  border-radius: var(--radius-control);
+}
+
+.num {
+  font: var(--type-data-sm);
+  color: var(--faint);
+}
+
+.word {
+  font: var(--type-data);
+  font-size: 0.78125rem;
+  color: var(--text);
+}
+
+@media (max-width: 639px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

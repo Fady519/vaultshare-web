@@ -1,0 +1,48 @@
+.row {
+  display: flex;
+  gap: 10px;
+}
+
+.box {
+  width: 58px;
+  height: 64px;
+  text-align: center;
+  background: var(--raised);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  font: var(--type-h1);
+  font-size: 1.5rem;
+  color: var(--text);
+  caret-color: var(--accent);
+  outline: none;
+  transition: border-color 0.12s var(--ease);
+}
+
+.box:focus,
+.filled {
+  border-color: var(--accent-line);
+}
+
+.box:focus {
+  border-color: var(--accent);
+}
+
+.error,
+.error:focus {
+  border-color: var(--danger);
+}
+
+.box:disabled {
+  opacity: 0.5;
+}
+
+@media (max-width: 639px) {
+  .row {
+    gap: 6px;
+  }
+
+  .box {
+    width: 44px;
+    height: 54px;
+  }
+}

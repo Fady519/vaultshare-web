@@ -1,0 +1,10 @@
+.noise {
+  margin: 0;
+  font: var(--type-data-sm);
+  line-height: 1.55;
+  letter-spacing: 0.3px;
+  color: var(--faint);
+  opacity: 0.45;
+  user-select: none;
+  white-space: pre;
+}

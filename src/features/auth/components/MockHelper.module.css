@@ -1,0 +1,43 @@
+.box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px dashed var(--warn);
+  border-radius: var(--radius-card);
+  background: transparent;
+}
+
+.tag {
+  font: var(--type-label);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--warn);
+}
+
+.subject {
+  font: var(--type-body-sm);
+  color: var(--text);
+}
+
+.text {
+  font: var(--type-micro);
+  color: var(--muted);
+}
+
+.code {
+  font: var(--type-data);
+  font-size: 0.9375rem;
+  letter-spacing: 2px;
+  color: var(--warn);
+}
+
+.action {
+  margin-top: 4px;
+  font: var(--type-data-sm);
+  font-size: 0.6875rem;
+  color: var(--warn);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
