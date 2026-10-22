@@ -155,7 +155,8 @@ export const authHandlers = [
       sendMail(
         email,
         'Someone tried to register with your address',
-        'If this was you, sign in instead.',
+        'You already have an account. If this was you, sign in instead.',
+        { link: `${location.origin}/signin` },
       )
     } else {
       const id = newId()
