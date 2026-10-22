@@ -1,0 +1,30 @@
+.sent {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+  background: var(--raised);
+  border-radius: var(--radius-control);
+}
+
+.bell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 60px;
+  height: 60px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--radius-control);
+  color: var(--accent);
+}
+
+.address {
+  font: var(--type-h3);
+}
+
+.when {
+  font: var(--type-body-sm);
+  color: var(--muted);
+}

@@ -1,0 +1,40 @@
+.from {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px;
+  background: var(--raised);
+  border-radius: var(--radius-control);
+}
+
+.who {
+  font: var(--type-h3);
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.steps li {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  height: 52px;
+  padding: 0 14px;
+  background: var(--raised);
+  border-radius: var(--radius-control);
+  font: var(--type-body-sm);
+}
+
+.n {
+  font: var(--type-data-sm);
+  color: var(--accent);
+}
+
+.where {
+  margin-left: auto;
+  font: var(--type-data-sm);
+  color: var(--faint);
+}
