@@ -84,7 +84,9 @@ export function FileRow({
       <span role="cell" className={styles.file}>
         <span className={styles.kind}>
           <FileKindBox mimeType={mimeType} name={name} />
-          {favorite && <Icon name="star" size={9} filled className={styles.star} label="Favorite" />}
+          {favorite && (
+            <Icon name="star" size={9} filled className={styles.star} label="Favorite" />
+          )}
         </span>
         <span className={styles.names}>
           <button type="button" className={styles.name} onClick={onOpen} title={name}>
@@ -108,7 +110,12 @@ export function FileRow({
       </span>
       <span role="cell" className={styles.actions}>
         {onMenu && (
-          <button type="button" className={styles.menu} onClick={onMenu} aria-label={`Actions for ${name}`}>
+          <button
+            type="button"
+            className={styles.menu}
+            onClick={onMenu}
+            aria-label={`Actions for ${name}`}
+          >
             <Icon name="dots" />
           </button>
         )}

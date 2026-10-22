@@ -27,9 +27,7 @@ export const TextField = forwardRef<HTMLInputElement, Props>(function TextField(
       <label htmlFor={inputId} className={styles.label}>
         {label}
       </label>
-      <div
-        className={cx(styles.box, error && styles.error, valid && !error && styles.valid)}
-      >
+      <div className={cx(styles.box, error && styles.error, valid && !error && styles.valid)}>
         <input
           ref={ref}
           id={inputId}
@@ -42,7 +40,11 @@ export const TextField = forwardRef<HTMLInputElement, Props>(function TextField(
         {trailing}
       </div>
       {hasHint && (
-        <p id={hintId} className={cx(styles.hint, error && styles.hintError)} role={error ? 'alert' : undefined}>
+        <p
+          id={hintId}
+          className={cx(styles.hint, error && styles.hintError)}
+          role={error ? 'alert' : undefined}
+        >
           {error || hint}
         </p>
       )}

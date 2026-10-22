@@ -27,5 +27,4 @@ export const useToasts = create<ToastState>((set) => ({
 }))
 
 // usable outside react too (api client, mutations)
-export const toast = (message: string, tone?: ToastTone) =>
-  useToasts.getState().push(message, tone)
+export const toast = (message: string, tone?: ToastTone) => useToasts.getState().push(message, tone)

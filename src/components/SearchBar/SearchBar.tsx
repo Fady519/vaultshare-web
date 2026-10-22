@@ -5,7 +5,7 @@ import styles from './SearchBar.module.css'
 
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform)
 
-type Props = InputHTMLAttributes<HTMLInputElement> & {
+type Props = Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> & {
   size?: 'md' | 'lg'
   shortcut?: boolean
   label?: string
