@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Avatar, Skeleton } from '@/components'
 import { useMe } from '@/api/me'
+import { signOut } from '@/features/auth/session'
+import { useSession } from '@/store/session'
 import styles from './UserMenu.module.css'
 
 const LINKS = [
@@ -17,6 +19,8 @@ const LINKS = [
 
 export function UserMenu() {
   const me = useMe()
+  const lock = useSession((s) => s.lock)
+  const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const wrapRef = useRef<HTMLDivElement>(null)
 
@@ -68,9 +72,29 @@ export function UserMenu() {
             </li>
           )}
           <li role="none" className={styles.sep}>
-            <Link role="menuitem" to="/signin" onClick={() => setOpen(false)}>
-              Lock &amp; sign out
-            </Link>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setOpen(false)
+                lock()
+              }}
+            >
+              Lock now
+            </button>
+          </li>
+          <li role="none">
+            <button
+              type="button"
+              role="menuitem"
+              onClick={async () => {
+                setOpen(false)
+                await signOut()
+                navigate('/signin')
+              }}
+            >
+              Sign out
+            </button>
           </li>
         </ul>
       )}

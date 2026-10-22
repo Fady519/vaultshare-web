@@ -54,8 +54,11 @@ button.trigger:hover {
   box-shadow: var(--shadow-overlay);
 }
 
-.menu a {
+.menu a,
+.menu button {
   display: block;
+  width: 100%;
+  text-align: left;
   padding: 7px 10px;
   border-radius: var(--radius-control);
   font: var(--type-body-sm);
@@ -64,7 +67,9 @@ button.trigger:hover {
 }
 
 .menu a:hover,
-.menu a:focus-visible {
+.menu a:focus-visible,
+.menu button:hover,
+.menu button:focus-visible {
   background: var(--surface);
   color: var(--text);
 }

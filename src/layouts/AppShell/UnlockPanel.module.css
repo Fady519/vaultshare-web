@@ -1,0 +1,40 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-16);
+  max-width: 520px;
+  padding: var(--s-64) 0;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: var(--raised);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-card);
+  color: var(--accent);
+}
+
+.title {
+  font: var(--type-h1);
+  letter-spacing: var(--ls-h1);
+}
+
+.text {
+  color: var(--muted);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-20);
+  margin-top: var(--s-8);
+}
+
+.actions {
+  display: flex;
+  gap: var(--s-12);
+}
