@@ -1,0 +1,26 @@
+.code {
+  font: var(--type-label);
+  letter-spacing: var(--ls-label);
+  color: var(--accent);
+}
+
+.title {
+  font: var(--type-h1);
+  letter-spacing: var(--ls-h1);
+}
+
+.text {
+  font: var(--type-body);
+  color: var(--muted);
+}
+
+.detail {
+  margin: 0;
+  padding: 12px 14px;
+  background: var(--code-bg);
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--radius-control);
+  font: var(--type-data);
+  color: var(--danger);
+  white-space: pre-wrap;
+}
