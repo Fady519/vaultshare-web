@@ -1,0 +1,19 @@
+.mark {
+  display: flex;
+  align-items: center;
+  gap: var(--s-8);
+  font: var(--type-label);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.num {
+  color: var(--accent);
+}
+
+.rule {
+  width: 18px;
+  height: 1px;
+  background: var(--faint);
+}

@@ -1,0 +1,30 @@
+.wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-8);
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+}
+
+.ok {
+  background: var(--accent);
+}
+
+.warn {
+  background: var(--warn);
+}
+
+.off {
+  background: var(--faint);
+}
+
+.text {
+  font: var(--type-data-sm);
+  letter-spacing: var(--ls-data);
+  color: var(--muted);
+}

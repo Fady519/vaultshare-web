@@ -1,0 +1,108 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-8);
+  height: 40px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  font: var(--type-body-sm);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background-color 0.15s var(--ease),
+    border-color 0.15s var(--ease),
+    color 0.15s var(--ease);
+}
+
+.sm {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 0.8125rem;
+}
+
+.lg {
+  height: 44px;
+  padding: 0 20px;
+}
+
+.block {
+  display: flex;
+  width: 100%;
+}
+
+.iconOnly {
+  padding: 0;
+  width: 40px;
+}
+
+.iconOnly.sm {
+  width: 32px;
+}
+
+.primary {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.soft {
+  background: var(--raised);
+  border-color: var(--rule-soft);
+  color: var(--text);
+}
+
+.soft:hover:not(:disabled) {
+  border-color: var(--rule);
+}
+
+.ghost {
+  border-color: var(--rule);
+  color: var(--text);
+}
+
+.ghost:hover:not(:disabled) {
+  background: var(--raised);
+}
+
+/* danger looks different on purpose, it marks things you can't undo */
+.danger {
+  background: var(--danger-soft);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.danger:hover:not(:disabled) {
+  background: var(--danger);
+  color: var(--bg);
+}
+
+.button:disabled {
+  opacity: 0.45;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 639px) {
+  .lg {
+    height: 50px;
+  }
+}

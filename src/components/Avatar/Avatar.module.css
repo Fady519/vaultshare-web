@@ -1,0 +1,38 @@
+.avatar {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  color: #0e100d;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.stack {
+  display: inline-flex;
+  align-items: center;
+}
+
+.stacked + .stacked {
+  margin-left: -4px;
+}
+
+.stacked {
+  box-shadow: 0 0 0 2px var(--bg);
+}
+
+.extra {
+  margin-left: 4px;
+  font: var(--type-data-sm);
+  color: var(--faint);
+}

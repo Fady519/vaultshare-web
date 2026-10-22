@@ -1,0 +1,43 @@
+.tag {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 9px;
+  border: 1px solid;
+  border-radius: var(--radius-control);
+  font: var(--type-label);
+  font-size: 0.59375rem;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.accent {
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+  color: var(--accent);
+}
+
+.warn {
+  background: var(--warn-soft);
+  border-color: var(--warn);
+  color: var(--warn);
+}
+
+.danger {
+  background: var(--danger-soft);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.neutral {
+  background: var(--raised);
+  border-color: var(--rule);
+  color: var(--muted);
+}
+
+.solid {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--bg);
+}

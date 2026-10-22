@@ -1,0 +1,13 @@
+.box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  background: var(--raised);
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--radius-control);
+  font-family: var(--font-mono);
+  font-size: 0.53125rem;
+  letter-spacing: 0.1px;
+  color: var(--muted);
+}

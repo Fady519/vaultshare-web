@@ -1,0 +1,29 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-8);
+  height: 32px;
+  padding: 0 15px;
+  background: var(--raised);
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--radius-control);
+  font: var(--type-body-sm);
+  font-size: 0.78125rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.chip:hover {
+  border-color: var(--rule);
+}
+
+.on {
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+  color: var(--accent);
+}
+
+.count {
+  font: var(--type-data-sm);
+  color: var(--faint);
+}
