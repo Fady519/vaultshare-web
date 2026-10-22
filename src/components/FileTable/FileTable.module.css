@@ -1,0 +1,156 @@
+.table {
+  --cols: minmax(0, 1fr) 140px 100px 150px 140px 32px;
+  width: 100%;
+}
+
+.selectable {
+  --cols: 28px minmax(0, 1fr) 140px 100px 150px 140px 32px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: var(--cols);
+  align-items: center;
+  column-gap: var(--s-12);
+}
+
+.head {
+  height: 34px;
+  border-bottom: 1px solid var(--rule);
+  font: var(--type-label);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.row {
+  height: 54px;
+  border-bottom: 1px solid var(--rule-soft);
+  transition: background-color 0.1s var(--ease);
+}
+
+.row:hover {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.selected,
+.selected:hover {
+  background: var(--accent-soft);
+}
+
+.check input {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.file {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.kind {
+  position: relative;
+  flex: none;
+}
+
+.star {
+  position: absolute;
+  top: 6px;
+  right: -11px;
+  color: var(--warn);
+}
+
+.names {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+  font: var(--type-body-sm);
+  font-weight: 500;
+  color: var(--text);
+}
+
+.name:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--faint);
+}
+
+.meta {
+  font: var(--type-data-sm);
+  font-size: 0.59375rem;
+  letter-spacing: var(--ls-data);
+  color: var(--faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cipher {
+  font: var(--type-data-sm);
+  letter-spacing: var(--ls-data);
+  color: var(--accent);
+}
+
+.version {
+  font: var(--type-data);
+  color: var(--muted);
+}
+
+.when {
+  display: flex;
+  flex-direction: column;
+  font: var(--type-body-sm);
+  font-size: 0.78125rem;
+  color: var(--muted);
+}
+
+.who {
+  font: var(--type-data-sm);
+  font-size: 0.59375rem;
+  color: var(--faint);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.menu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-control);
+  color: var(--faint);
+}
+
+.menu:hover {
+  background: var(--raised);
+  color: var(--text);
+}
+
+/* laptop: drop the cipher column, it's the same on every row anyway */
+@media (max-width: 1279px) {
+  .table {
+    --cols: minmax(0, 1fr) 80px 120px 120px 32px;
+  }
+  .selectable {
+    --cols: 28px minmax(0, 1fr) 80px 120px 120px 32px;
+  }
+  .head > :nth-last-child(5),
+  .cipher {
+    display: none;
+  }
+}

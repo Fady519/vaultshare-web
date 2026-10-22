@@ -1,0 +1,16 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-12);
+  padding: var(--s-32) 0;
+}
+
+.title {
+  font: var(--type-h1);
+  letter-spacing: var(--ls-h1);
+}
+
+.note {
+  font: var(--type-data);
+  color: var(--faint);
+}
