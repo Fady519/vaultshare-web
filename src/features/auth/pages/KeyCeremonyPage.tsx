@@ -20,7 +20,7 @@ import { downloadText } from '@/utils/download'
 import { formatDate } from '@/utils/format'
 import { CeremonySteps, type CeremonyStepRow } from '../components/CeremonySteps'
 import { RecoveryWords } from '../components/RecoveryWords'
-import { signOut } from '../session'
+import { signOut, updateUser } from '../session'
 import s from '../auth.module.css'
 import styles from './KeyCeremonyPage.module.css'
 
@@ -159,8 +159,7 @@ export default function KeyCeremonyPage() {
             className={s.footerEnd}
             onClick={() => {
               // the server already moved the account on; the guard follows the store
-              if (user)
-                useSession.getState().setUser({ ...user, status: 'pendingMfa', keyVersion: 1 })
+              if (user) updateUser({ ...user, status: 'pendingMfa', keyVersion: 1 })
               navigate('/setup/2fa')
             }}
           >

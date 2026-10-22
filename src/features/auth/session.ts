@@ -14,6 +14,12 @@ export function startSession(res: SessionResponse) {
   queryClient.setQueryData(meKeys.me, res.user)
 }
 
+// the store and the cached /me must agree, or the UI shows a stale account state
+export function updateUser(user: UserDto) {
+  useSession.getState().setUser(user)
+  queryClient.setQueryData(meKeys.me, user)
+}
+
 // only allow in-app paths after sign in (no open redirects)
 export function safeNext(next: string | null) {
   return next && next.startsWith('/') && !next.startsWith('//') ? next : '/vaults'

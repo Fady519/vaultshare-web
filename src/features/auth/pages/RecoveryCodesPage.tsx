@@ -7,7 +7,7 @@ import { ApiError, errorMessage } from '@/api/client'
 import { useDocumentTitle } from '@/hooks/useCrumbs'
 import { useSession } from '@/store/session'
 import { downloadText } from '@/utils/download'
-import { acceptPendingInvite } from '../session'
+import { acceptPendingInvite, updateUser } from '../session'
 import s from '../auth.module.css'
 import styles from './RecoveryCodesPage.module.css'
 
@@ -66,7 +66,7 @@ export default function RecoveryCodesPage() {
       await acceptPendingInvite()
       toast('Your vault is ready.', 'ok')
       // flipping the status lets the app routes in; the guard would redirect us anyway
-      useSession.getState().setUser({ ...user, status: 'active', mfaEnabled: true })
+      updateUser({ ...user, status: 'active', mfaEnabled: true })
       navigate('/vaults', { replace: true })
     } catch (err) {
       setError(err instanceof ApiError && err.errors?.code ? err.errors.code[0] : errorMessage(err))
