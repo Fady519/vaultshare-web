@@ -1,0 +1,66 @@
+.stack {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-8);
+  width: min(380px, calc(100vw - 32px));
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--s-12);
+  padding: 12px 14px 12px 0;
+  background: var(--raised);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-overlay);
+  font: var(--type-body-sm);
+  animation: slide 0.2s var(--ease);
+}
+
+.toast p {
+  flex: 1;
+}
+
+.toast button {
+  color: var(--faint);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.bar {
+  align-self: stretch;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  background: var(--muted);
+}
+
+.ok .bar {
+  background: var(--accent);
+}
+
+.warn .bar {
+  background: var(--warn);
+}
+
+.danger .bar {
+  background: var(--danger);
+}
+
+@keyframes slide {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (max-width: 639px) {
+  .stack {
+    right: 16px;
+    bottom: 80px;
+  }
+}

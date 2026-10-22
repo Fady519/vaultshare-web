@@ -1,0 +1,53 @@
+.callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 18px;
+  border: 1px solid;
+  border-radius: var(--radius-card);
+  font: var(--type-body-sm);
+  font-size: 0.8125rem;
+}
+
+.icon {
+  flex: none;
+  margin-top: 2px;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.title {
+  font-weight: 600;
+}
+
+.info {
+  background: var(--raised);
+  border-color: var(--rule);
+  color: var(--muted);
+}
+
+.info .title {
+  color: var(--text);
+}
+
+.ok {
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+  color: var(--accent);
+}
+
+.warn {
+  background: var(--warn-soft);
+  border-color: var(--warn);
+  color: var(--warn);
+}
+
+.danger {
+  background: var(--danger-soft);
+  border-color: var(--danger);
+  color: var(--danger);
+}

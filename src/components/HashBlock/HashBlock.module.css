@@ -1,0 +1,36 @@
+.block {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  background: var(--code-bg);
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--radius-control);
+}
+
+.label {
+  font: var(--type-label);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.value {
+  font: var(--type-data);
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.copy {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font: var(--type-data-sm);
+  color: var(--faint);
+}
+
+.copy:hover {
+  color: var(--accent);
+}
