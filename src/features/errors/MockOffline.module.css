@@ -1,0 +1,63 @@
+.page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px 16px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-16);
+  max-width: 640px;
+  padding: 40px 44px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-panel);
+}
+
+.code {
+  font: var(--type-label);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--warn);
+}
+
+.title {
+  font: var(--type-h1);
+  letter-spacing: var(--ls-h1);
+}
+
+.text {
+  color: var(--muted);
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-left: 20px;
+  list-style: decimal;
+  color: var(--text);
+  font: var(--type-body-sm);
+}
+
+.steps code,
+.steps kbd {
+  padding: 0 4px;
+  background: var(--raised);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  font: var(--type-data-sm);
+}
+
+.button {
+  align-self: flex-start;
+  height: 40px;
+  padding: 0 18px;
+  background: var(--accent);
+  border-radius: var(--radius-control);
+  color: var(--on-accent);
+  font-weight: 600;
+}

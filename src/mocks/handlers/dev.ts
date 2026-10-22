@@ -7,8 +7,11 @@ import { currentTotp, secondsLeft } from '../totp'
   clicked through without a mail server or a phone:
   - /__dev/outbox  the emails the "server" sent (verify codes, recovery links)
   - /__dev/totp    the current authenticator code for an account
+  - /__dev/ping    lets the app check the mock is really the one answering
 */
 export const devHandlers = [
+  http.get('/__dev/ping', () => HttpResponse.json({ mock: true })),
+
   http.get('/__dev/outbox', ({ request }) => {
     const to = new URL(request.url).searchParams.get('to')?.toLowerCase()
     return HttpResponse.json(db.outbox.filter((m) => !to || m.to === to).slice(0, 5))
