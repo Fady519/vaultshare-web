@@ -38,10 +38,33 @@ Then open http://localhost:5173.
 | `npm run preview` | serve the production build |
 | `npm run lint` | ESLint |
 | `npm run format` | Prettier |
+| `npm test` | unit tests (the crypto module) |
+
+### Demo accounts (mock server)
+
+All four have real keys (made by `scripts/make-mock-seed.ts`) and the same password:
+
+| Email | Password |
+|---|---|
+| `jack@northgate.io` (admin) | `northgate-vault-2026` |
+| `maya@northgate.io` · `ilan@northgate.io` · `sam@northgate.io` | `northgate-vault-2026` |
+
+There is no mail server and no phone in mock mode, so two dashed orange boxes help you
+click through. They only exist when `VITE_USE_MOCKS=true`:
+
+- **Mock inbox** on the verify-email and forgot-password pages: shows the code / link the
+  "server" sent.
+- **Mock authenticator** on the 2FA pages: shows the code an authenticator app would show.
+  A real app works too — scan the QR code on the setup page.
+
+Jack also has the ten recovery codes from Figma screen 07 (`4KQ2-9WFH`, `8ZJ5-3MTA`, …).
+Recovery words for each demo user are in [`src/mocks/seed-keys.json`](src/mocks/seed-keys.json).
+A pending invite for a new user is at `/invite/demo-invite-2026`.
 
 ### Useful pages while developing
 
-- `/vaults` — the app shell, data comes from the mock API
+- `/` landing · `/signup` · `/signin` · `/forgot`
+- `/vaults` — the app shell (needs sign-in)
 - `/dev/ui` — every component on one page (compare with Figma screen 55). Has a
   "Reset mock data" button.
 
@@ -74,7 +97,7 @@ src/
   components/      the design-system components + the 23 icons
   layouts/         AppShell (rail + topbar), AuthSplit, StepCard, PublicLayout
   features/        one folder per area: auth, vault, files, sharing, settings, admin
-  crypto/          the only place encryption code is written (phase 2)
+  crypto/          the only place encryption code is written (Argon2id, HKDF, AES-GCM, RSA-OAEP)
   api/             fetch client, DTO types, TanStack Query hooks
   mocks/           MSW fake server + its local "database"
   store/           Zustand stores (session keys live in memory only)
@@ -93,7 +116,7 @@ src/
 | Phase | Scope | Status |
 |---|---|---|
 | 1 | Project setup, design tokens, components, layouts, routes, API client, mock server | done |
-| 2 | Crypto module + onboarding & auth (13 screens) | |
+| 2 | Crypto module + onboarding & auth (13 screens) | done |
 | 3 | Vault & files I — upload/encrypt, download/decrypt, detail, versions, preview | |
 | 4 | Vault & files II — rename/move, delete, bulk, favorites, recent, search, trash | |
 | 5 | Sharing & permissions — share, step-up, secure links, members, invites | |
