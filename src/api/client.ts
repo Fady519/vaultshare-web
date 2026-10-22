@@ -90,6 +90,14 @@ async function toProblem(res: Response): Promise<ProblemDetails> {
   try {
     return { ...base, ...(await res.json()) }
   } catch {
+    // no ProblemDetails at all: usually the dev proxy saying the backend isn't up
+    if (res.status >= 500) {
+      return {
+        ...base,
+        title: 'The API server could not be reached',
+        detail: `The API answered ${res.status} with no details. If you run against the real backend, check that it is up (VITE_API_TARGET).`,
+      }
+    }
     return base
   }
 }
