@@ -1,0 +1,130 @@
+/*
+  Cold Storage tokens. Values come from vaultShare-figma/design-tokens.json,
+  names follow the Figma paint styles so a design review and a code review
+  talk about the same thing.
+*/
+
+:root {
+  /* light · marketing */
+  --ink-primary: #12140f;
+  --ink-body: #33352e;
+  --ink-muted: #6c6a62;
+  --ink-faint: #9a978e;
+  --surface-paper: #f2f1ee;
+  --surface-white: #ffffff;
+  --rule-default: #dad8d1;
+  --rule-soft-light: #e7e5df;
+  --accent-pine: #1f6b54;
+  --accent-pine-soft: #e4ede9;
+  --accent-pine-line: #bcd3c9;
+  --signal-warn: #9c5518;
+  --signal-warn-soft: #f6eadc;
+  --signal-danger: #96291e;
+  --signal-danger-soft: #f7e6e3;
+
+  /* dark · product */
+  --dark-canvas: #101311;
+  --dark-surface: #171a18;
+  --dark-raised: #20241f;
+  --dark-rule: #2a2e28;
+  --dark-text: #f1f0ea;
+  --dark-muted: #8e948b;
+  --dark-faint: #5f655d;
+  --dark-accent: #57c79e;
+  --dark-accent-soft: #16261f;
+  --dark-accent-line: #2c5445;
+  --dark-warn: #d8974b;
+  --dark-danger: #e2705f;
+
+  /* what components actually use. product is dark by default */
+  --bg: var(--dark-canvas);
+  --surface: var(--dark-surface);
+  --raised: var(--dark-raised);
+  --rule: var(--dark-rule);
+  --rule-soft: #1f231e;
+  --text: var(--dark-text);
+  --muted: var(--dark-muted);
+  --faint: var(--dark-faint);
+  --accent: var(--dark-accent);
+  --accent-soft: var(--dark-accent-soft);
+  --accent-line: var(--dark-accent-line);
+  --on-accent: #101311;
+  --warn: var(--dark-warn);
+  --warn-soft: #2a2116;
+  --danger: var(--dark-danger);
+  --danger-soft: #2b1917;
+  --scrim: rgba(5, 7, 6, 0.62);
+  --code-bg: #0c0e0d;
+
+  /* type */
+  --font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'Roboto Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+
+  --type-display1: 700 4rem/3.875rem var(--font-sans);
+  --type-display2: 700 2.75rem/2.875rem var(--font-sans);
+  --type-h1: 700 1.875rem/2.125rem var(--font-sans);
+  --type-h2: 600 1.375rem/1.75rem var(--font-sans);
+  --type-h3: 600 1.0625rem/1.5rem var(--font-sans);
+  --type-body-lg: 400 1.125rem/1.75rem var(--font-sans);
+  --type-body: 400 0.9375rem/1.4375rem var(--font-sans);
+  --type-body-sm: 400 0.84375rem/1.25rem var(--font-sans);
+  --type-micro: 400 0.75rem/1.0625rem var(--font-sans);
+  --type-label: 500 0.65625rem/0.875rem var(--font-mono);
+  --type-data: 400 0.71875rem/1.125rem var(--font-mono);
+  --type-data-sm: 400 0.625rem/0.9375rem var(--font-mono);
+
+  --ls-display1: -1.5px;
+  --ls-display2: -1.1px;
+  --ls-h1: -0.55px;
+  --ls-h2: -0.35px;
+  --ls-h3: -0.2px;
+  --ls-label: 1.5px;
+  --ls-data: 0.1px;
+
+  /* spacing scale — nothing outside it */
+  --s-4: 4px;
+  --s-8: 8px;
+  --s-12: 12px;
+  --s-16: 16px;
+  --s-20: 20px;
+  --s-24: 24px;
+  --s-32: 32px;
+  --s-40: 40px;
+  --s-48: 48px;
+  --s-64: 64px;
+  --s-96: 96px;
+
+  --radius-control: 2px;
+  --radius-card: 3px;
+  --radius-panel: 4px;
+  --radius-pill: 999px;
+
+  --shadow-overlay: 0 24px 64px rgba(0, 0, 0, 0.45);
+
+  --rail-w: 248px;
+  --topbar-h: 60px;
+  --content-max: 1112px;
+
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+.theme-light {
+  --bg: var(--surface-paper);
+  --surface: var(--surface-white);
+  --raised: var(--surface-paper);
+  --rule: var(--rule-default);
+  --rule-soft: var(--rule-soft-light);
+  --text: var(--ink-primary);
+  --muted: var(--ink-muted);
+  --faint: var(--ink-faint);
+  --accent: var(--accent-pine);
+  --accent-soft: var(--accent-pine-soft);
+  --accent-line: var(--accent-pine-line);
+  --on-accent: #ffffff;
+  --warn: var(--signal-warn);
+  --warn-soft: var(--signal-warn-soft);
+  --danger: var(--signal-danger);
+  --danger-soft: var(--signal-danger-soft);
+  --scrim: rgba(18, 20, 15, 0.4);
+  --code-bg: var(--ink-primary);
+}
