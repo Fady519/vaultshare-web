@@ -1,19 +1,32 @@
 import { useQuery } from '@tanstack/react-query'
 import { api } from './client'
 import type {
+  BulkAction,
+  BulkResponse,
   CommitRequest,
   DownloadResponse,
   FileDetailDto,
   FileDto,
   UploadInitRequest,
+  RecentEntry,
   UploadInitResponse,
   VersionDto,
 } from './types'
 
 export const fileKeys = {
+  all: ['files'] as const,
   vault: (vaultId: string) => ['files', 'vault', vaultId] as const,
   one: (fileId: string) => ['files', fileId] as const,
   versions: (fileId: string) => ['files', fileId, 'versions'] as const,
+  favorites: ['files', 'favorites'] as const,
+  recent: ['files', 'recent'] as const,
+  trash: ['files', 'trash'] as const,
+  index: ['files', 'index'] as const,
+}
+
+export type MoveRequest = {
+  targetVaultId: string
+  wrappedKeys: { versionId: string; userId: string; keyVersion: number; wrapped: string }[]
 }
 
 export const filesApi = {
@@ -28,6 +41,22 @@ export const filesApi = {
   abort: (versionId: string) => api.del<void>(`/uploads/${versionId}`),
   download: (fileId: string, versionId: string) =>
     api.get<DownloadResponse>(`/files/${fileId}/versions/${versionId}/download`),
+  rename: (fileId: string, body: { encName: string; nameIv: string }) =>
+    api.patch<FileDto>(`/files/${fileId}`, body),
+  move: (fileId: string, body: MoveRequest) => api.post<FileDto>(`/files/${fileId}/move`, body),
+  trash: (fileId: string) => api.del<void>(`/files/${fileId}`),
+  restore: (fileId: string) => api.post<FileDto>(`/files/${fileId}/restore`),
+  purge: (fileId: string) => api.del<void>(`/files/${fileId}/purge`),
+  favorite: (fileId: string, on: boolean) =>
+    on ? api.put<void>(`/files/${fileId}/favorite`) : api.del<void>(`/files/${fileId}/favorite`),
+  bulk: (action: BulkAction, fileIds: string[]) =>
+    api.post<BulkResponse>('/files/bulk', { action, fileIds }),
+  favorites: () => api.get<FileDto[]>('/files/favorites'),
+  recent: (days = 30) => api.get<RecentEntry[]>(`/files/recent?days=${days}`),
+  clearRecent: () => api.del<void>('/files/recent'),
+  trashList: () => api.get<FileDto[]>('/files/trash'),
+  // every file I can read, so search can run here; the search words are never sent
+  index: () => api.get<FileDto[]>('/files/index'),
 }
 
 /*
@@ -74,4 +103,20 @@ export function useFileVersions(fileId: string | undefined) {
     queryFn: () => filesApi.versions(fileId!),
     enabled: Boolean(fileId),
   })
+}
+
+export function useFavorites() {
+  return useQuery({ queryKey: fileKeys.favorites, queryFn: filesApi.favorites })
+}
+
+export function useRecent(days = 30) {
+  return useQuery({ queryKey: [...fileKeys.recent, days], queryFn: () => filesApi.recent(days) })
+}
+
+export function useTrash() {
+  return useQuery({ queryKey: fileKeys.trash, queryFn: filesApi.trashList })
+}
+
+export function useFileIndex() {
+  return useQuery({ queryKey: fileKeys.index, queryFn: filesApi.index })
 }
