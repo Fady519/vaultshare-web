@@ -1,0 +1,36 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lead {
+  font: var(--type-body-sm);
+  color: var(--muted);
+}
+
+.url {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--code-bg);
+  border-radius: var(--radius-control);
+}
+
+.url code {
+  flex: 1;
+  min-width: 0;
+  font: var(--type-data-sm);
+  font-size: 0.75rem;
+  word-break: break-all;
+}
+
+.fragment {
+  color: var(--accent);
+}
+
+.meta {
+  font: var(--type-micro);
+  color: var(--faint);
+}
