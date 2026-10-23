@@ -5,7 +5,9 @@ import { decryptText, nameAad, noteAad, unwrapDataKey } from '@/crypto'
 import { useSession } from '@/store/session'
 
 /*
-  Unwrapped data keys, cached per version while the vault is unlocked.
+  Unwrapped data keys, cached while the vault is unlocked. The cache key is the
+  wrapped blob itself, not just the version: after a key rotation the same
+  version has a new key, and a stale entry would quietly fail to decrypt.
   They're non-extractable CryptoKeys and the whole cache is dropped on lock,
   together with every decrypted name and plaintext held by react-query.
 */
@@ -23,18 +25,19 @@ export function dataKeyFor(wrapped: WrappedKeyDto) {
   const privateKey = useSession.getState().privateKey
   if (!privateKey) return Promise.reject(new LockedError())
 
-  let key = keys.get(wrapped.versionId)
+  const id = `${wrapped.versionId}:${wrapped.wrapped}`
+  let key = keys.get(id)
   if (!key) {
     key = unwrapDataKey(privateKey, wrapped.wrapped)
-    keys.set(wrapped.versionId, key)
-    key.catch(() => keys.delete(wrapped.versionId))
+    keys.set(id, key)
+    key.catch(() => keys.delete(id))
   }
   return key
 }
 
-// after a key rotation the cached key for that version is the old one
+// after a key rotation: drop the old key of that version and anything decrypted with it
 export function forgetDataKey(versionId: string) {
-  keys.delete(versionId)
+  for (const id of keys.keys()) if (id.startsWith(`${versionId}:`)) keys.delete(id)
   queryClient.removeQueries({ queryKey: ['plaintext', versionId] })
 }
 
@@ -63,7 +66,7 @@ export function useFileNames(files: FileDto[] | undefined) {
       const entries = await Promise.all(
         (files ?? []).map(async (f) => {
           try {
-            return [f.id, (await decryptFileName(f)) ?? 'No key for you'] as const
+            return [f.id, (await decryptFileName(f)) ?? 'Sealed · no key yet'] as const
           } catch {
             return [f.id, 'Could not decrypt name'] as const
           }
