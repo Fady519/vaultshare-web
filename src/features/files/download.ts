@@ -31,9 +31,11 @@ export async function decryptVersion(
 ): Promise<Decrypted> {
   onProgress?.({ stage: 'fetch', chunk: 0, chunkCount: 0 })
   const info = await filesApi.download(fileId, versionId)
+  signal?.throwIfAborted()
 
   onProgress?.({ stage: 'unwrap', chunk: 0, chunkCount: info.chunkCount })
   const key = await dataKeyFor(info.wrappedKey)
+  signal?.throwIfAborted()
 
   const parts: Uint8Array[] = []
   try {
