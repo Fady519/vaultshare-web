@@ -58,6 +58,28 @@ export async function unwrapDataKey(privateKey: CryptoKey, wrappedB64: string) {
   }
 }
 
+/*
+  Moving a file to another vault: the same data key, wrapped again for the new
+  member set. The raw key exists only inside this function and is zeroed after.
+*/
+export async function rewrapDataKey(
+  privateKey: CryptoKey,
+  wrappedB64: string,
+  recipients: { userId: string; publicKey: string }[],
+) {
+  const raw = await rsaDecrypt(privateKey, fromBase64(wrappedB64))
+  try {
+    return await Promise.all(
+      recipients.map(async (r) => ({
+        userId: r.userId,
+        wrapped: await wrapDataKey(raw, r.publicKey),
+      })),
+    )
+  } finally {
+    raw.fill(0)
+  }
+}
+
 export async function sha256(bytes: Uint8Array) {
   return new Uint8Array(await crypto.subtle.digest('SHA-256', buf(bytes)))
 }

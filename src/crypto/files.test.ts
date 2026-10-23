@@ -13,6 +13,7 @@ import {
   encryptText,
   nameAad,
   newDataKey,
+  rewrapDataKey,
   sha256,
   unwrapDataKey,
   versionDigest,
@@ -78,6 +79,22 @@ describe('data key wrapping', () => {
     expect(new TextDecoder().decode(plain)).toBe('hello')
 
     await expect(unwrapDataKey(bob.privateKey, forAlice)).rejects.toBeInstanceOf(DecryptError)
+  })
+
+  it('re-wraps the same key for a new member set when a file moves', async () => {
+    const alice = await generateKeyPair()
+    const carol = await generateKeyPair()
+    const { raw, key } = await newDataKey()
+    const forAlice = await wrapDataKey(raw, toBase64(await exportPublicKey(alice.publicKey)))
+    const sealed = await encryptChunk(key, new TextEncoder().encode('moved'), chunkAad('f', 'v', 0))
+
+    const [forCarol] = await rewrapDataKey(alice.privateKey, forAlice, [
+      { userId: 'carol', publicKey: toBase64(await exportPublicKey(carol.publicKey)) },
+    ])
+    expect(forCarol.userId).toBe('carol')
+    const carolKey = await unwrapDataKey(carol.privateKey, forCarol.wrapped)
+    const plain = await decryptChunk(carolKey, sealed.ciphertext, sealed.iv, chunkAad('f', 'v', 0))
+    expect(new TextDecoder().decode(plain)).toBe('moved')
   })
 })
 
