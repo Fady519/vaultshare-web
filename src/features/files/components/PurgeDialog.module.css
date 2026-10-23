@@ -1,0 +1,33 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-20);
+}
+
+.rows > div {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 16px;
+  padding: 13px 14px;
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.rows dt {
+  font: var(--type-label);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.rows dd {
+  font: var(--type-data-sm);
+  word-break: break-word;
+}
+
+.danger {
+  color: var(--danger);
+}
+
+.ok {
+  color: var(--accent);
+}

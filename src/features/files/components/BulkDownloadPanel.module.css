@@ -1,0 +1,33 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  background: var(--raised);
+  border-radius: var(--radius-control);
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+}
+
+.text p {
+  font: var(--type-body-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text span {
+  font: var(--type-data-sm);
+  color: var(--faint);
+}

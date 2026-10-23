@@ -1,0 +1,66 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-20);
+}
+
+.vaults {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: -6px;
+  max-height: 290px;
+  overflow-y: auto;
+}
+
+.vault {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 16px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  font: var(--type-body-sm);
+  color: var(--muted);
+}
+
+.vault input {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border: 1.5px solid var(--faint);
+  border-radius: 50%;
+}
+
+.vault input:checked {
+  border-color: var(--accent);
+  background: radial-gradient(var(--accent) 0 4px, transparent 4.5px);
+}
+
+.on {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+.vaultName {
+  flex: 1;
+}
+
+.count {
+  font: var(--type-data-sm);
+  color: var(--faint);
+}
+
+.warn {
+  font: var(--type-micro);
+  color: var(--warn);
+}
+
+.busy {
+  margin-right: auto;
+  font: var(--type-data-sm);
+  color: var(--accent);
+}
