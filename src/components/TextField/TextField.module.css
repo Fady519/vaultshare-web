@@ -48,6 +48,11 @@
   color: var(--text);
 }
 
+/* the box border already shows focus, the global ring would draw a second one inside it */
+.input:focus-visible {
+  outline: none;
+}
+
 .input::placeholder {
   color: var(--faint);
 }
