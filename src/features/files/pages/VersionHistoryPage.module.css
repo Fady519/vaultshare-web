@@ -1,0 +1,147 @@
+.table {
+  margin-top: 4px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 120px minmax(140px, 1.3fr) 100px 70px 140px minmax(120px, 1.5fr) 236px;
+  align-items: center;
+  gap: 14px;
+  min-height: 64px;
+  padding: 0 12px 0 16px;
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.headRow {
+  min-height: 44px;
+  font: var(--type-label);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--faint);
+  border-bottom-color: var(--rule);
+}
+
+.current {
+  background: var(--raised);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.no {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font: var(--type-h3);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  font: var(--type-body-sm);
+}
+
+.mono {
+  font: var(--type-data-sm);
+  color: var(--muted);
+}
+
+.note {
+  min-width: 0;
+  font: var(--type-body-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.note em {
+  font-style: normal;
+  color: var(--faint);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.summary {
+  margin-top: 28px;
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-card);
+}
+
+.summaryHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: var(--type-label);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.delta {
+  color: var(--accent);
+}
+
+.rule {
+  width: 18px;
+  height: 1px;
+  background: var(--faint);
+}
+
+.summarySub {
+  margin-top: 8px;
+  font: var(--type-data-sm);
+  color: var(--accent);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 22px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.statValue {
+  font: var(--type-h1);
+  font-size: 1.75rem;
+}
+
+.add {
+  color: var(--accent);
+}
+
+.remove {
+  color: var(--danger);
+}
+
+.statLabel {
+  font: var(--type-data-sm);
+  color: var(--faint);
+}
+
+.summaryErr {
+  margin-top: 10px;
+  font: var(--type-micro);
+  color: var(--danger);
+}
+
+.summaryFoot {
+  margin-top: 10px;
+  font: var(--type-data-sm);
+  color: var(--faint);
+}

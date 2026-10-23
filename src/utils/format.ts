@@ -64,3 +64,11 @@ export function shortHash(hex: string, head = 4, tail = 2) {
   if (hex.length <= head + tail) return hex
   return `${hex.slice(0, head)}…${hex.slice(-tail)}`
 }
+
+// "Today 09:14" or "10 Aug 17:02", the committed column of the version list
+export function formatWhen(iso: string, now = new Date()) {
+  const d = new Date(iso)
+  const time = formatTime(iso)
+  if (d.toDateString() === now.toDateString()) return `Today ${time}`
+  return `${String(d.getDate()).padStart(2, '0')} ${MONTHS[d.getMonth()]} ${time}`
+}
