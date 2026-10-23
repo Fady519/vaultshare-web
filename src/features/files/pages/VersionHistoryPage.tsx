@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Avatar, Button, Callout, PageHead, SkeletonRows, Tag } from '@/components'
 import { useFileDetail, useFileVersions } from '@/api/files'
-import { useVault } from '@/api/vaults'
 import type { VersionDto } from '@/api/types'
 import { useCrumbs } from '@/hooks/useCrumbs'
 import { cx } from '@/utils/cx'
@@ -13,6 +12,7 @@ import { lineDiff, type LineDiff } from '../diff'
 import { DownloadPanel } from '../components/DownloadPanel'
 import { RestoreDialog } from '../components/RestoreDialog'
 import { UploadPanel } from '../components/UploadPanel'
+import { fileAccess } from '../access'
 import styles from './VersionHistoryPage.module.css'
 
 export default function VersionHistoryPage() {
@@ -20,7 +20,7 @@ export default function VersionHistoryPage() {
   const detail = useFileDetail(fileId)
   const file = detail.data?.file
   const name = useFileName(file)
-  const vault = useVault(file?.vaultId)
+  const access = fileAccess(detail.data)
   const versions = useFileVersions(fileId)
   const notes = useVersionNotes(versions.data)
 
@@ -29,8 +29,8 @@ export default function VersionHistoryPage() {
   const [uploadOpen, setUploadOpen] = useState(false)
 
   useCrumbs(
-    { label: 'Vaults', to: '/vaults' },
-    file ? { label: file.vaultName, to: `/vaults/${file.vaultId}` } : '…',
+    ...(access.viaShare ? [] : [{ label: 'Vaults', to: '/vaults' }]),
+    access.crumb,
     name ? { label: name, to: `/files/${fileId}` } : '…',
     'Versions',
   )
@@ -40,7 +40,7 @@ export default function VersionHistoryPage() {
     [versions.data],
   )
   const current = list[0]
-  const canWrite = vault.data ? vault.data.role !== 'viewer' : false
+  const canWrite = access.canWrite
 
   if (detail.isError || versions.isError) {
     return (

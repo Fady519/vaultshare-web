@@ -9,6 +9,8 @@ type Props = {
   bytes: number
   keyCopies: number
   canWrite: boolean
+  canShare: boolean
+  onShare: () => void
   onToggleAll: (on: boolean) => void
   onMove: () => void
   onDownload: () => void
@@ -41,7 +43,13 @@ export function BulkBar(p: Props) {
         {formatBytes(p.bytes)} ciphertext · {p.keyCopies} wrapped key copies
       </span>
       <div className={styles.actions}>
-        <Button variant="ghost" size="sm" disabled title="Sharing is not wired up yet">
+        <Button
+          variant="ghost"
+          size="sm"
+          disabled={!p.canShare}
+          title={p.canShare ? undefined : 'Only owners and managers can share'}
+          onClick={p.onShare}
+        >
           Share
         </Button>
         <Button variant="ghost" size="sm" disabled={!p.canWrite} onClick={p.onMove}>

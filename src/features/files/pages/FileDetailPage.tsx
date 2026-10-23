@@ -13,7 +13,6 @@ import {
   Tag,
 } from '@/components'
 import { useFileDetail } from '@/api/files'
-import { useVault } from '@/api/vaults'
 import type { AuditAction, FileAccessEntry } from '@/api/types'
 import { fromBase64, IntegrityError, toHex } from '@/crypto'
 import { useCrumbs } from '@/hooks/useCrumbs'
@@ -26,6 +25,8 @@ import { DownloadPanel } from '../components/DownloadPanel'
 import { FilePreview } from '../components/FilePreview'
 import { MockTamper } from '../components/MockTamper'
 import { RenameMoveDialog } from '../components/RenameMoveDialog'
+import { ShareDialog } from '@/features/sharing/components/ShareDialog'
+import { fileAccess } from '../access'
 import { toggleFavorite, trashWithUndo } from '../actions'
 import styles from './FileDetailPage.module.css'
 
@@ -53,9 +54,9 @@ export default function FileDetailPage() {
   const [asked, setAsked] = useState(false)
   const [downloading, setDownloading] = useState(false)
   const [moving, setMoving] = useState(false)
+  const [sharing, setSharing] = useState(false)
   const navigate = useNavigate()
-  const vault = useVault(detail.data?.file.vaultId)
-  const canWrite = vault.data ? vault.data.role !== 'viewer' : false
+  const access = fileAccess(detail.data)
 
   const previewable = file ? canPreview(file.mimeType) : false
   const auto = file ? file.sizeBytes <= AUTO_PREVIEW_BYTES : false
@@ -65,8 +66,8 @@ export default function FileDetailPage() {
   )
 
   useCrumbs(
-    { label: 'Vaults', to: '/vaults' },
-    file ? { label: file.vaultName, to: `/vaults/${file.vaultId}` } : '…',
+    ...(access.viaShare ? [] : [{ label: 'Vaults', to: '/vaults' }]),
+    access.crumb,
     name ?? '…',
   )
 
@@ -93,7 +94,15 @@ export default function FileDetailPage() {
         }
         actions={
           <>
-            <Button variant="ghost" icon="share" disabled title="Sharing is not wired up yet">
+            <Button
+              variant="ghost"
+              icon="share"
+              disabled={!access.canShare || !name}
+              title={
+                access.canShare ? undefined : 'Only owners and managers of the vault can share'
+              }
+              onClick={() => setSharing(true)}
+            >
               Share
             </Button>
             <Button variant="ghost" icon="clock" to={`/files/${fileId}/versions`}>
@@ -110,11 +119,15 @@ export default function FileDetailPage() {
                     label: file.isFavorite ? 'Remove from favorites' : 'Add to favorites',
                     onSelect: () => toggleFavorite(file),
                   },
-                  { label: 'Rename or move', disabled: !canWrite, onSelect: () => setMoving(true) },
+                  {
+                    label: 'Rename or move',
+                    disabled: !access.canOrganize,
+                    onSelect: () => setMoving(true),
+                  },
                   {
                     label: 'Move to trash',
                     danger: true,
-                    disabled: !canWrite,
+                    disabled: !access.canOrganize,
                     onSelect: () => {
                       trashWithUndo([file.id], name)
                       navigate(`/vaults/${file.vaultId}`)
@@ -238,6 +251,9 @@ export default function FileDetailPage() {
 
       {file && name && downloading && (
         <DownloadPanel open onClose={() => setDownloading(false)} file={file} name={name} />
+      )}
+      {file && name && sharing && (
+        <ShareDialog files={[{ file, name }]} onClose={() => setSharing(false)} />
       )}
       {file && name && moving && (
         <RenameMoveDialog files={[{ file, name }]} onClose={() => setMoving(false)} />

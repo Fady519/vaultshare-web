@@ -76,3 +76,7 @@
   font-weight: 600;
   pointer-events: none;
 }
+
+.notice {
+  margin-top: 16px;
+}

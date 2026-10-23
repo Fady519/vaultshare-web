@@ -25,6 +25,8 @@ import { DropZone } from '@/features/files/components/DropZone'
 import { RenameMoveDialog } from '@/features/files/components/RenameMoveDialog'
 import { BulkDownloadPanel } from '@/features/files/components/BulkDownloadPanel'
 import { toggleFavorite, trashWithUndo } from '@/features/files/actions'
+import { ShareDialog } from '@/features/sharing/components/ShareDialog'
+import { PendingGrants } from '@/features/sharing/components/PendingGrants'
 import { BulkBar } from '../components/BulkBar'
 import styles from './VaultPage.module.css'
 
@@ -42,6 +44,7 @@ export default function VaultPage() {
   const [dragging, setDragging] = useState(false)
   const [moving, setMoving] = useState<{ file: FileDto; name: string }[] | null>(null)
   const [bulkDownload, setBulkDownload] = useState<{ file: FileDto; name: string }[] | null>(null)
+  const [sharing, setSharing] = useState<{ file: FileDto; name: string }[] | null>(null)
   const items = files.data?.items ?? []
   const selection = useSelection(items.map((f) => f.id))
 
@@ -65,7 +68,9 @@ export default function VaultPage() {
   }
 
   const v = vault.data
-  const canWrite = v ? v.role !== 'viewer' : false
+  const pending = v?.myStatus === 'pending'
+  const canWrite = v ? v.role !== 'viewer' && !pending : false
+  const canShare = v ? (v.role === 'owner' || v.role === 'manager') && !pending : false
   const nameOf = (f: FileDto) => names.data?.[f.id] ?? '…'
   const picked = items.filter((f) => selection.selected.has(f.id))
   const withNames = (list: FileDto[]) => list.map((file) => ({ file, name: nameOf(file) }))
@@ -108,8 +113,8 @@ export default function VaultPage() {
           </p>
         </div>
         <div className={styles.actions}>
-          <Button variant="ghost" icon="share" disabled title="Sharing is not wired up yet">
-            Share
+          <Button variant="ghost" icon="users" to={`/vaults/${vaultId}/members`}>
+            Members
           </Button>
           <Button
             icon="upload"
@@ -121,6 +126,20 @@ export default function VaultPage() {
           </Button>
         </div>
       </header>
+
+      {pending && (
+        <Callout
+          tone="warn"
+          icon="key"
+          title="You're in, but your keys aren't here yet"
+          className={styles.notice}
+        >
+          An owner or manager of {v?.name} has to wrap the vault's keys for your public key. That
+          happens the next time one of them opens the vault; until then the files stay sealed for
+          you.
+        </Callout>
+      )}
+      {canShare && <PendingGrants vaultId={vaultId} />}
 
       {files.isPending && <SkeletonRows rows={6} />}
 
@@ -163,6 +182,8 @@ export default function VaultPage() {
           bytes={picked.reduce((n, f) => n + f.sizeBytes, 0)}
           keyCopies={picked.reduce((n, f) => n + f.people.length, 0)}
           canWrite={canWrite}
+          canShare={canShare}
+          onShare={() => setSharing(withNames(picked))}
           onToggleAll={selection.setAll}
           onMove={() => setMoving(withNames(picked))}
           onDownload={() => setBulkDownload(withNames(picked))}
@@ -210,6 +231,12 @@ export default function VaultPage() {
                           disabled: !canPreview(f.mimeType),
                         },
                         { label: 'Download', onSelect: () => setDownloading(f) },
+                        {
+                          label: 'Share…',
+                          disabled: !canShare,
+                          hint: canShare ? undefined : 'Only owners and managers can share',
+                          onSelect: () => setSharing([{ file: f, name }]),
+                        },
                         { label: 'Versions', onSelect: () => navigate(`/files/${f.id}/versions`) },
                         {
                           label: 'Upload new version',
@@ -269,6 +296,7 @@ export default function VaultPage() {
       )}
 
       {moving && <RenameMoveDialog files={moving} onClose={() => setMoving(null)} />}
+      {sharing && <ShareDialog files={sharing} onClose={() => setSharing(null)} />}
 
       {bulkDownload && (
         <BulkDownloadPanel files={bulkDownload} onClose={() => setBulkDownload(null)} />

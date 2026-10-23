@@ -11,6 +11,8 @@ import { useFileName } from '../keys'
 import { canPreview, usePlaintext } from '../plaintext'
 import { DownloadPanel } from '../components/DownloadPanel'
 import { FilePreview } from '../components/FilePreview'
+import { ShareDialog } from '@/features/sharing/components/ShareDialog'
+import { fileAccess } from '../access'
 import styles from './FilePreviewPage.module.css'
 
 // figma 36. ?v=<versionId> previews an older version from the history page
@@ -22,6 +24,7 @@ export default function FilePreviewPage() {
   const file = detail.data?.file
   const name = useFileName(file)
   const [downloading, setDownloading] = useState(false)
+  const [sharing, setSharing] = useState(false)
 
   const version =
     versions.data?.find((v) => v.id === params.get('v')) ??
@@ -30,9 +33,10 @@ export default function FilePreviewPage() {
   const plain = usePlaintext(previewable ? file?.id : undefined, version?.id)
   const old = version && file && version.id !== file.currentVersion.id
 
+  const access = fileAccess(detail.data)
   useCrumbs(
-    { label: 'Vaults', to: '/vaults' },
-    file ? { label: file.vaultName, to: `/vaults/${file.vaultId}` } : '…',
+    ...(access.viaShare ? [] : [{ label: 'Vaults', to: '/vaults' }]),
+    access.crumb,
     name ? { label: name, to: `/files/${fileId}` } : '…',
     old ? `Preview v${version.versionNo}` : 'Preview',
   )
@@ -62,7 +66,14 @@ export default function FilePreviewPage() {
             <Button icon="down" disabled={!name || !version} onClick={() => setDownloading(true)}>
               Download
             </Button>
-            <Button variant="ghost" disabled title="Sharing is not wired up yet">
+            <Button
+              variant="ghost"
+              disabled={!access.canShare || !name}
+              title={
+                access.canShare ? undefined : 'Only owners and managers of the vault can share'
+              }
+              onClick={() => setSharing(true)}
+            >
               Share
             </Button>
             <Button variant="ghost" to={`/files/${fileId}/versions`}>
@@ -158,6 +169,9 @@ export default function FilePreviewPage() {
         </aside>
       </div>
 
+      {file && name && sharing && (
+        <ShareDialog files={[{ file, name }]} onClose={() => setSharing(false)} />
+      )}
       {file && name && version && downloading && (
         <DownloadPanel
           open
