@@ -1,10 +1,10 @@
 import { useEffect } from 'react'
 import { toast } from '@/components'
-import { IDLE_MINUTES, useSession } from '@/store/session'
+import { idleMinutesOf, useSession } from '@/store/session'
 
 const ACTIVITY = ['pointerdown', 'keydown', 'mousemove', 'wheel', 'touchstart'] as const
 
-// FR-06: after 15 idle minutes the private key is dropped from memory
+// FR-06: after the idle minutes (15 by default) the private key is dropped from memory
 export function useIdleLock() {
   useEffect(() => {
     let lastTouch = 0
@@ -19,10 +19,12 @@ export function useIdleLock() {
     }
 
     const timer = setInterval(() => {
-      const { privateKey, lockAt, lock } = useSession.getState()
+      const { privateKey, lockAt, lock, user } = useSession.getState()
       if (privateKey && lockAt && Date.now() >= lockAt) {
         lock()
-        toast(`Locked after ${IDLE_MINUTES} idle minutes. Your keys were cleared from memory.`)
+        toast(
+          `Locked after ${idleMinutesOf(user)} idle minutes. Your keys were cleared from memory.`,
+        )
       }
     }, 5_000)
 

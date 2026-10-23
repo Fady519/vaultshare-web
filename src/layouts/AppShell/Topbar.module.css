@@ -50,6 +50,7 @@ a.crumb:hover {
 }
 
 .bell {
+  position: relative;
   display: inline-flex;
   padding: 6px;
   border-radius: var(--radius-control);
@@ -69,4 +70,21 @@ a.crumb:hover {
   .search {
     width: 200px;
   }
+}
+
+.badge {
+  position: absolute;
+  top: -2px;
+  right: -4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font: var(--type-data-sm);
+  font-size: 0.625rem;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
 }

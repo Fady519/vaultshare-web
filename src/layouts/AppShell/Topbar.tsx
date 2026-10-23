@@ -2,12 +2,15 @@ import { Fragment, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Icon, SearchBar } from '@/components'
 import { useUi } from '@/store/ui'
+import { useNotifications } from '@/api/settings'
 import { LockIndicator } from './LockIndicator'
 import styles from './Topbar.module.css'
 
 export function Topbar() {
   const crumbs = useUi((s) => s.crumbs)
   const setSearchQuery = useUi((s) => s.setSearchQuery)
+  const notifications = useNotifications()
+  const unread = notifications.data?.filter((n) => !n.read).length ?? 0
   const navigate = useNavigate()
   const searchRef = useRef<HTMLInputElement>(null)
 
@@ -50,8 +53,13 @@ export function Topbar() {
 
       <div className={styles.tools}>
         <LockIndicator />
-        <Link to="/notifications" className={styles.bell} aria-label="Notifications">
+        <Link
+          to="/notifications"
+          className={styles.bell}
+          aria-label={unread ? `Notifications, ${unread} unread` : 'Notifications'}
+        >
           <Icon name="bell" />
+          {unread > 0 && <span className={styles.badge}>{unread > 9 ? '9+' : unread}</span>}
         </Link>
         <form
           role="search"

@@ -8,8 +8,10 @@ import type { MfaMethod, UserDto } from '@/api/types'
   needs the password again.
 */
 
-// FR-06: lock after 15 minutes without activity
+// FR-06: lock after 15 minutes without activity, unless the person picked another value
 export const IDLE_MINUTES = 15
+
+export const idleMinutesOf = (user: UserDto | null) => user?.idleLockMinutes ?? IDLE_MINUTES
 
 // between "password accepted" and "second factor accepted"
 export type PendingMfa = {
@@ -61,10 +63,15 @@ export const useSession = create<SessionState>((set, get) => ({
 
   // once the private key is open the wrap key isn't needed any more
   unlock: (privateKey) =>
-    set({ privateKey, wrapKey: null, wrapSalt: null, lockAt: Date.now() + IDLE_MINUTES * 60_000 }),
+    set({
+      privateKey,
+      wrapKey: null,
+      wrapSalt: null,
+      lockAt: Date.now() + idleMinutesOf(get().user) * 60_000,
+    }),
 
   touch: () => {
-    if (get().privateKey) set({ lockAt: Date.now() + IDLE_MINUTES * 60_000 })
+    if (get().privateKey) set({ lockAt: Date.now() + idleMinutesOf(get().user) * 60_000 })
   },
 
   // drop the key references so they can be garbage collected
