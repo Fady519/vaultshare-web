@@ -1,0 +1,37 @@
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--s-24);
+  padding: 34px 0 24px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.text {
+  min-width: 0;
+}
+
+.title {
+  font: var(--type-h1);
+  font-size: 1.75rem;
+  letter-spacing: var(--ls-h1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  margin-top: 8px;
+  font: var(--type-data-sm);
+  font-size: 0.65625rem;
+  letter-spacing: var(--ls-data);
+  color: var(--faint);
+  white-space: pre-wrap;
+}
+
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 10px;
+  margin-top: 2px;
+}
