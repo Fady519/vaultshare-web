@@ -236,6 +236,10 @@ export const authHandlers = [
     if (!user.emailVerified) {
       return problem(403, 'EMAIL_NOT_VERIFIED', 'Confirm your email address first.')
     }
+    // only said after the password checks out, so it doesn't tell strangers the account exists
+    if (user.status === 'disabled') {
+      return problem(403, 'ACCOUNT_DISABLED', 'An administrator suspended this account.')
+    }
 
     // onboarding not finished: no second factor exists yet, let them continue setup
     if (user.status === 'pendingKeys' || user.status === 'pendingMfa') {

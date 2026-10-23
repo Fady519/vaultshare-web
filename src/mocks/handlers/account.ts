@@ -361,7 +361,7 @@ export const accountHandlers = [
     if (shared.length) {
       return problem(
         409,
-        'VALIDATION_FAILED',
+        'OWNS_SHARED_VAULTS',
         `You own vaults other people use (${shared.map((v) => v.name).join(', ')}). Hand them over or remove the others first.`,
       )
     }
