@@ -1,0 +1,68 @@
+.wait {
+  padding: 40px 0;
+  text-align: center;
+  font: var(--type-data-sm);
+  color: var(--faint);
+}
+
+.body,
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.kicker {
+  font: var(--type-label);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.file {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px;
+  background: var(--raised);
+  border-radius: var(--radius-card);
+}
+
+.fileText {
+  min-width: 0;
+}
+
+.fileText h1 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-h2);
+  font-size: 1.25rem;
+}
+
+.fileText p {
+  font: var(--type-data-sm);
+  color: var(--faint);
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.title {
+  font: var(--type-h2);
+}
+
+.lead {
+  font: var(--type-body-sm);
+  color: var(--muted);
+}
+
+.note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: var(--type-micro);
+  color: var(--faint);
+}
