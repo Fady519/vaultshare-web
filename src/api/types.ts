@@ -275,6 +275,9 @@ export type VersionDto = {
   sizeBytes: number
   chunkCount: number
   digest: Base64
+  // optional note ("Redlined clause 7.2"), sealed with this version's data key
+  encNote: Base64 | null
+  noteIv: Base64 | null
   createdAt: IsoDate
   createdBy: Person
   // only the caller's own key, null if they hold none
@@ -340,6 +343,8 @@ export type NewWrappedKey = { userId: Guid; keyVersion: number; wrapped: Base64 
 export type CommitRequest = {
   encName: Base64
   nameIv: Base64
+  encNote?: Base64
+  noteIv?: Base64
   digest: Base64
   chunks: ChunkMeta[]
   wrappedKeys: NewWrappedKey[]

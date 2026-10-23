@@ -1,4 +1,5 @@
 import type { AuditAction, AuditEntryDto, SystemRole, UserStatus, VaultRole } from '@/api/types'
+import { clearBlobs } from './blobStore'
 import { seed } from './seed'
 
 /*
@@ -117,6 +118,61 @@ export type MockMail = {
 
 export type MockAudit = Omit<AuditEntryDto, 'actorName'> & { action: AuditAction }
 
+// ---- files (Files, FileVersions, Chunks, WrappedKeys in the book's ERD) ----
+
+export type MockFile = {
+  id: string
+  vaultId: string
+  // sealed with the current version's data key
+  encName: string
+  nameIv: string
+  mimeType: string
+  ownerId: string
+  state: 'uploading' | 'active' | 'trashed'
+  deletedAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export type MockVersion = {
+  id: string
+  fileId: string
+  versionNo: number
+  sizeBytes: number
+  chunkCount: number
+  digest: string
+  encNote: string | null
+  noteIv: string | null
+  storagePfx: string
+  committed: boolean
+  createdAt: string
+  createdBy: string
+}
+
+export type MockChunk = {
+  versionId: string
+  index: number
+  iv: string
+  tag: string
+  digest: string
+}
+
+export type MockWrappedKey = {
+  versionId: string
+  userId: string
+  keyVersion: number
+  wrapped: string
+}
+
+export type MockFavorite = { userId: string; fileId: string }
+
+export type MockAccess = {
+  userId: string
+  fileId: string
+  action: 'upload' | 'download'
+  at: string
+}
+
 export type MockDb = {
   version: number
   users: MockUser[]
@@ -134,10 +190,16 @@ export type MockDb = {
   invitations: MockInvitation[]
   outbox: MockMail[]
   audit: MockAudit[]
+  files: MockFile[]
+  versions: MockVersion[]
+  chunks: MockChunk[]
+  wrappedKeys: MockWrappedKey[]
+  favorites: MockFavorite[]
+  access: MockAccess[]
 }
 
 // bump when the shape changes, old local data gets reseeded
-const DB_VERSION = 2
+const DB_VERSION = 3
 const STORAGE_KEY = 'vaultshare.mock-db'
 
 export let db = {} as MockDb
@@ -154,7 +216,14 @@ function load(): MockDb | null {
 }
 
 export async function initDb() {
-  db = load() ?? { version: DB_VERSION, ...(await seed()) }
+  const existing = load()
+  if (existing) {
+    db = existing
+  } else {
+    // the encrypted file chunks live in IndexedDB, start those over too
+    await clearBlobs()
+    db = { version: DB_VERSION, ...(await seed()) }
+  }
   save()
 }
 
@@ -162,8 +231,9 @@ export function save() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(db))
 }
 
-export function resetMockDb() {
+export async function resetMockDb() {
   localStorage.removeItem(STORAGE_KEY)
+  await clearBlobs()
   document.cookie = 'vs_refresh=; Path=/; Max-Age=0'
   window.location.href = '/'
 }

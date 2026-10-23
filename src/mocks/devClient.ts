@@ -14,3 +14,13 @@ export async function fetchTotp(
   const res = await fetch(`/__dev/totp?email=${encodeURIComponent(email)}`)
   return res.ok ? res.json() : { code: null, secondsLeft: 0 }
 }
+
+export async function tamperState(versionId: string): Promise<boolean> {
+  const res = await fetch(`/__dev/tamper?versionId=${versionId}`)
+  return res.ok ? (await res.json()).tampered : false
+}
+
+export async function toggleTamper(versionId: string): Promise<boolean> {
+  const res = await fetch(`/__dev/tamper?versionId=${versionId}`, { method: 'POST' })
+  return res.ok ? (await res.json()).tampered : false
+}

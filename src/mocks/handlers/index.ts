@@ -1,5 +1,6 @@
 import { authHandlers } from './auth'
 import { devHandlers } from './dev'
+import { fileHandlers, storageHandlers } from './files'
 import { invitationHandlers } from './invitations'
 import { keyHandlers } from './keys'
 import { meHandlers } from './me'
@@ -13,6 +14,8 @@ export const handlers = [
   ...mfaHandlers,
   ...meHandlers,
   ...vaultHandlers,
+  ...fileHandlers,
+  ...storageHandlers,
   ...invitationHandlers,
   ...devHandlers,
 ]

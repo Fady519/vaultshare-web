@@ -1,11 +1,8 @@
 import { delay, http, HttpResponse } from 'msw'
 import type { CreateVaultRequest, MemberDto, VaultDto, VaultRole } from '@/api/types'
 import { db, save, type MockVault } from '../db'
+import { roleOf, vaultStats } from '../fileHelpers'
 import { API, authenticate, newId, now, problem } from './utils'
-
-function roleOf(vaultId: string, userId: string) {
-  return db.members.find((m) => m.vaultId === vaultId && m.userId === userId)?.role
-}
 
 function toVaultDto(v: MockVault, userId: string): VaultDto {
   return {
@@ -14,10 +11,8 @@ function toVaultDto(v: MockVault, userId: string): VaultDto {
     description: v.description,
     ownerId: v.ownerId,
     role: roleOf(v.id, userId) ?? 'viewer',
-    // files arrive in phase 3
-    fileCount: 0,
+    ...vaultStats(v.id),
     memberCount: db.members.filter((m) => m.vaultId === v.id).length,
-    sizeBytes: 0,
     createdAt: v.createdAt,
   }
 }

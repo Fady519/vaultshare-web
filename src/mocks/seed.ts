@@ -1,5 +1,6 @@
 import type { MockDb, MockFactor, MockMember, MockUser, MockVault } from './db'
 import { hashCode } from './hash'
+import { seedFiles } from './seedFiles'
 import keys from './seed-keys.json'
 
 /*
@@ -103,7 +104,7 @@ export async function seed(): Promise<Omit<MockDb, 'version'>> {
     })),
   )
 
-  return {
+  const base = {
     users: [
       user('jack', ID.jack, 'jack@northgate.io', 'Jack Bermingham', { systemRole: 'admin' }),
       user('maya', ID.maya, 'maya@northgate.io', 'Maya Okafor'),
@@ -137,6 +138,17 @@ export async function seed(): Promise<Omit<MockDb, 'version'>> {
       member(ID.board, ID.maya, 'viewer'),
       member(ID.personal, ID.jack, 'owner'),
     ],
+  }
+
+  const fileTables = await seedFiles(
+    base,
+    { legal: ID.legal, eng: ID.eng, board: ID.board, personal: ID.personal },
+    { jack: ID.jack, maya: ID.maya, ilan: ID.ilan },
+  )
+
+  return {
+    ...base,
+    ...fileTables,
     factors: [
       totp('jack', ID.jack),
       totp('maya', ID.maya),
