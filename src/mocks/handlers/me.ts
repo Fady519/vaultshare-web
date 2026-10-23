@@ -14,6 +14,7 @@ export function toUserDto(u: MockUser): UserDto {
     systemRole: u.systemRole,
     keyVersion: u.keyVersion,
     mfaEnabled: db.factors.some((f) => f.userId === u.id && f.confirmed),
+    idleLockMinutes: u.idleLockMinutes,
     createdAt: u.createdAt,
   }
 }

@@ -49,7 +49,13 @@ export type MockMember = {
   joinedAt: string
 }
 
-export type MockAccessToken = { token: string; userId: string; expiresAt: number }
+// familyId = the refresh family it came from, i.e. which session ("device") it belongs to
+export type MockAccessToken = {
+  token: string
+  userId: string
+  familyId: string | null
+  expiresAt: number
+}
 
 export type MockRefreshToken = {
   token: string
@@ -116,7 +122,11 @@ export type MockMail = {
   createdAt: string
 }
 
-export type MockAudit = Omit<AuditEntryDto, 'actorName'> & { action: AuditAction }
+export type MockAudit = Omit<AuditEntryDto, 'actorName'> & {
+  action: AuditAction
+  // set by the /__dev/audit-tamper switch only
+  tamperedFrom?: AuditAction
+}
 
 // ---- files (Files, FileVersions, Chunks, WrappedKeys in the book's ERD) ----
 
@@ -214,6 +224,43 @@ export type MockAccess = {
   at: string
 }
 
+export type NotificationCategory = 'share' | 'access' | 'security' | 'quota'
+
+export type MockNotification = {
+  id: string
+  userId: string
+  key: string
+  category: NotificationCategory
+  // may contain {file}: the browser swaps in the decrypted name, the server can't know it
+  title: string
+  body: string
+  link: string | null
+  fileId: string | null
+  read: boolean
+  createdAt: string
+}
+
+export type MockNotificationPref = { userId: string; key: string; enabled: boolean }
+
+export type MockKeyHistory = {
+  userId: string
+  keyVersion: number
+  fingerprint: string
+  algorithm: string
+  createdAt: string
+  retiredAt: string | null
+  // retired = replaced by a rotation (every key re-wrapped); revoked = reset, keys lost
+  state: 'active' | 'retired' | 'revoked'
+}
+
+// organisation-wide settings an admin can change
+export type MockSettings = {
+  retentionDays: number
+  quotaBytes: number
+  linkMaxDays: number
+  mfaRequired: boolean
+}
+
 export type MockDb = {
   version: number
   users: MockUser[]
@@ -240,10 +287,14 @@ export type MockDb = {
   shares: MockShare[]
   links: MockLink[]
   rekeys: MockRekey[]
+  notifications: MockNotification[]
+  notificationPrefs: MockNotificationPref[]
+  keyHistory: MockKeyHistory[]
+  settings: MockSettings
 }
 
 // bump when the shape changes, old local data gets reseeded
-const DB_VERSION = 5
+const DB_VERSION = 6
 const STORAGE_KEY = 'vaultshare.mock-db'
 
 export let db = {} as MockDb

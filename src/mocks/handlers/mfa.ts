@@ -6,6 +6,7 @@ import { appendAudit } from '../audit'
 import { hashCode } from '../hash'
 import { newTotpSecret, otpauthUri, verifyTotp } from '../totp'
 import { API, authenticate, checkStepUp, invalid, newId, now, problem } from './utils'
+import { notify } from '../notify'
 
 const CODE_ALPHABET = '0123456789ABCDEFGHJKLMNPQRSTUVWXYZ'
 
@@ -146,6 +147,13 @@ export const mfaHandlers = [
 
     const codes = Array.from({ length: 10 }, recoveryCode)
     db.recoveryCodes = db.recoveryCodes.filter((c) => c.userId !== u.id)
+    if (u.status === 'active') {
+      notify(u.id, 'security.recovery', {
+        title: 'New recovery codes were made',
+        body: 'The old ten codes no longer work.',
+        link: '/settings/security',
+      })
+    }
     for (const c of codes)
       db.recoveryCodes.push({ userId: u.id, hash: await hashCode(c), usedAt: null })
     save()
@@ -190,6 +198,10 @@ export const mfaHandlers = [
 
     db.factors = db.factors.filter((f) => f.id !== params.id)
     await appendAudit(auth.user.id, 'mfa.remove', 'user', auth.user.id)
+    notify(auth.user.id, 'security.recovery', {
+      title: 'A second factor was removed',
+      link: '/settings/security',
+    })
     save()
     return new HttpResponse(null, { status: 204 })
   }),

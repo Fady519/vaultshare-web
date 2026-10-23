@@ -1,3 +1,5 @@
+import { accountHandlers } from './account'
+import { adminHandlers } from './admin'
 import { authHandlers } from './auth'
 import { devHandlers } from './dev'
 import { fileActionHandlers } from './fileActions'
@@ -8,6 +10,7 @@ import { libraryHandlers } from './library'
 import { meHandlers } from './me'
 import { memberHandlers } from './members'
 import { mfaHandlers } from './mfa'
+import { notificationHandlers } from './notifications'
 import { rekeyHandlers } from './rekey'
 import { sharingHandlers } from './sharing'
 import { vaultHandlers } from './vaults'
@@ -18,6 +21,9 @@ export const handlers = [
   ...keyHandlers,
   ...mfaHandlers,
   ...meHandlers,
+  ...accountHandlers,
+  ...notificationHandlers,
+  ...adminHandlers,
   ...vaultHandlers,
   // before fileHandlers: /files/favorites must not match /files/:fileId
   ...libraryHandlers,

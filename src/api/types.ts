@@ -87,6 +87,8 @@ export type UserDto = {
   systemRole: SystemRole
   keyVersion: number
   mfaEnabled: boolean
+  // the idle lock, per person (5 | 15 | 30 | 60)
+  idleLockMinutes: number
   createdAt: IsoDate
 }
 
@@ -508,8 +510,44 @@ export type SessionDto = {
   ipMasked: string
   location: string
   createdAt: IsoDate
+  // when this browser was first seen for the account
+  firstSeenAt: IsoDate
   lastActiveAt: IsoDate
+  refreshExpiresAt: IsoDate
+  // "remember this device" was ticked
+  trusted: boolean
   current: boolean
+}
+
+export type ChangePasswordRequest = {
+  // proves the current password without sending it
+  currentVerifier: Base64
+  saltAuth: Base64
+  saltWrap: Base64
+  verifier: Base64
+  // the same private key, sealed under the new password
+  sealedPrivateKey: Base64
+  signOutOthers: boolean
+}
+
+export type KeyHistoryDto = {
+  keyVersion: number
+  fingerprint: string
+  algorithm: string
+  createdAt: IsoDate
+  retiredAt: IsoDate | null
+  // how many data keys are wrapped to this key right now
+  wrappedCount: number
+  state: 'active' | 'retired' | 'revoked'
+}
+
+export type RotateKeysRequest = {
+  publicKey: Base64
+  sealedPrivateKey: Base64
+  sealedRecoveryKey: Base64
+  keyVersion: number
+  // every data key I hold, wrapped again to the new public key
+  rewrapped: { versionId: Guid; wrapped: Base64 }[]
 }
 
 export type SecurityOverviewDto = {
@@ -523,21 +561,25 @@ export type SecurityOverviewDto = {
 
 export type NotificationDto = {
   id: Guid
+  key: string
   category: 'share' | 'access' | 'security' | 'quota'
+  // may contain "{file}": the browser puts in the name it decrypts, the server never has it
   title: string
   body: string
   link: string | null
+  fileId: Guid | null
   read: boolean
   createdAt: IsoDate
 }
 
-export type NotificationSettingsDto = {
-  categories: {
-    key: NotificationDto['category']
-    inApp: boolean
-    email: boolean
-    locked: boolean
-  }[]
+export type NotificationSettingDto = {
+  key: string
+  group: 'security' | 'sharing' | 'vault'
+  label: string
+  channels: string
+  enabled: boolean
+  // security alerts: always on
+  locked: boolean
 }
 
 export type TeamMemberDto = {
@@ -547,13 +589,17 @@ export type TeamMemberDto = {
   systemRole: SystemRole
   status: UserStatus
   lastActiveAt: IsoDate | null
-  vaults: { vaultId: Guid; name: string; role: VaultRole }[]
+  vaults: { vaultId: Guid; name: string; role: VaultRole; status: 'active' | 'pending' }[]
+  mfa: ('totp' | 'webauthn')[]
+  fingerprint: string | null
 }
 
 export type StorageUsageDto = {
   usedBytes: number
   quotaBytes: number
   overheadBytes: number
+  // ciphertext still in the trash, counted in usedBytes
+  trashBytes: number
   retentionDays: number
   byVault: {
     vaultId: Guid
@@ -561,6 +607,7 @@ export type StorageUsageDto = {
     sizeBytes: number
     fileCount: number
     versionCount: number
+    memberCount: number
   }[]
 }
 
@@ -577,6 +624,12 @@ export type AdminOverviewDto = {
     linkMaxDays: number
     mfaRequired: boolean
   }
+  security: {
+    mfaEnrolled: number
+    pendingKeyExchanges: { displayName: string; vaultName: string; since: IsoDate }[]
+    failedSignIns7d: number
+    sharesExpiring14d: number
+  }
 }
 
 export type AdminUserDto = {
@@ -588,6 +641,8 @@ export type AdminUserDto = {
   storageBytes: number
   createdAt: IsoDate
   lastActiveAt: IsoDate | null
+  fingerprint: string | null
+  mfa: ('totp' | 'webauthn')[]
 }
 
 // ---------- audit ----------
@@ -628,6 +683,8 @@ export type AuditAction =
   | 'audit.export'
   | 'session.revoke'
   | 'account.delete'
+  | 'auth.password'
+  | 'keys.recovery'
 
 export type AuditEntryDto = {
   seq: number
@@ -639,6 +696,23 @@ export type AuditEntryDto = {
   resourceId: Guid
   prevHash: string
   hash: string
+}
+
+export type AuditQuery = {
+  vaultId?: Guid
+  actorId?: Guid
+  action?: AuditAction
+  from?: IsoDate
+  to?: IsoDate
+  page?: number
+  pageSize?: number
+}
+
+// the signature is null until the backend signs daily anchors (RSA-PSS)
+export type AuditExportDto = {
+  entries: AuditEntryDto[]
+  anchors: AuditAnchorDto[]
+  signature: Base64 | null
 }
 
 export type AuditAnchorDto = {

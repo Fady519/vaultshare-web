@@ -1,8 +1,8 @@
 import type { FileDto, VaultRole, VersionDto, WrappedKeyDto } from '@/api/types'
 import { db, type MockFile, type MockShare, type MockVersion } from './db'
 
-// days a trashed file waits before it's purged (admin setting in phase 6)
-export const RETENTION_DAYS = 30
+// days a trashed file waits before it's purged (an admin setting, see /storage)
+export const retentionDays = () => db.settings?.retentionDays ?? 30
 
 export const roleOf = (vaultId: string, userId: string) =>
   db.members.find((m) => m.vaultId === vaultId && m.userId === userId)?.role
@@ -33,7 +33,7 @@ export function holdersOf(fileId: string, vaultId: string) {
 }
 
 export const purgeAtOf = (deletedAt: string) =>
-  new Date(new Date(deletedAt).getTime() + RETENTION_DAYS * 86_400_000).toISOString()
+  new Date(new Date(deletedAt).getTime() + retentionDays() * 86_400_000).toISOString()
 
 export const userName = (id: string) => db.users.find((u) => u.id === id)?.displayName ?? 'Unknown'
 

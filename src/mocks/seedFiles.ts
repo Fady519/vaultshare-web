@@ -18,6 +18,7 @@ import type {
   MockAccess,
   MockFavorite,
   MockLink,
+  MockNotification,
   MockShare,
   MockVersion,
   MockWrappedKey,
@@ -525,6 +526,7 @@ export async function seedFiles(
   const access: MockAccess[] = []
   const shares: MockShare[] = []
   const links: MockLink[] = []
+  const notifications: MockNotification[] = []
   const events: Omit<MockAudit, 'seq' | 'prevHash' | 'hash'>[] = []
   const now = Date.now()
   const at = (h: number) => new Date(now - h * 3_600_000).toISOString()
@@ -653,6 +655,19 @@ export async function seedFiles(
             ? new Date(now + sh.expiresInDays * 86_400_000).toISOString()
             : null,
         })
+        const by = base.users.find((u) => u.id === userIds[sh.by])!
+        notifications.push({
+          id: crypto.randomUUID(),
+          userId: userIds[sh.to],
+          key: 'share.received',
+          category: 'share',
+          title: `${by.displayName} shared {file} with you`,
+          body: `${sh.role} · the data key is wrapped to your public key`,
+          link: `/files/${fileId}`,
+          fileId,
+          read: sh.hoursAgo > 24,
+          createdAt: at(sh.hoursAgo),
+        })
         events.push({
           timestamp: at(sh.hoursAgo),
           actorId: userIds[sh.by],
@@ -683,6 +698,7 @@ export async function seedFiles(
     shares,
     links,
     rekeys: [],
+    notifications,
     audit: await chain(events),
   }
 }

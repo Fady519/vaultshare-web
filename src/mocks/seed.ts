@@ -187,12 +187,76 @@ export async function seed(): Promise<Omit<MockDb, 'version'>> {
       },
     ],
     accessTokens: [],
-    refreshTokens: [],
+    // Jack is also signed in on a phone, a tablet and an unknown Windows box (figma 44)
+    refreshTokens: [
+      otherSession(ID.jack, IPHONE, 2, true),
+      otherSession(ID.jack, WINDOWS, 0.07, false),
+      otherSession(ID.jack, IPAD, 6 * 24, true),
+    ],
     mfaTokens: [],
     emailCodes: [],
     recoveryTokens: [],
     challenges: [],
     stepUps: [],
     outbox: [],
+    notifications: [
+      ...fileTables.notifications,
+      {
+        id: crypto.randomUUID(),
+        userId: ID.jack,
+        key: 'security.new_sign_in',
+        category: 'security',
+        title: 'New sign-in: Chrome 128 on Windows',
+        body: 'If this was not you, revoke the session and change your password.',
+        link: '/settings/sessions',
+        fileId: null,
+        read: false,
+        createdAt: hoursAgo(0.07),
+      },
+    ],
+    notificationPrefs: [],
+    keyHistory: base.users.map((u) => ({
+      userId: u.id,
+      keyVersion: u.keyVersion,
+      fingerprint: u.fingerprint,
+      algorithm: 'RSA-4096-OAEP',
+      createdAt: u.keysCreatedAt ?? u.createdAt,
+      retiredAt: null,
+      state: 'active' as const,
+    })),
+    settings: {
+      retentionDays: 30,
+      quotaBytes: 10 * 1024 ** 3,
+      linkMaxDays: 90,
+      mfaRequired: true,
+    },
+  }
+}
+
+const IPHONE =
+  'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'
+const WINDOWS =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36'
+const IPAD =
+  'Mozilla/5.0 (iPad; CPU OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1'
+
+const hoursAgo = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString()
+
+// a refresh family nobody can use (the token is random), only there to be listed and revoked
+function otherSession(
+  userId: string,
+  userAgent: string,
+  lastUsedHoursAgo: number,
+  remember: boolean,
+) {
+  return {
+    token: crypto.randomUUID(),
+    userId,
+    familyId: crypto.randomUUID(),
+    usedAt: null,
+    createdAt: hoursAgo(lastUsedHoursAgo),
+    expiresAt: Date.now() + 14 * 86_400_000 - lastUsedHoursAgo * 3_600_000,
+    userAgent,
+    remember,
   }
 }

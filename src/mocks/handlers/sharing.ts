@@ -24,6 +24,7 @@ import {
   userName,
 } from '../fileHelpers'
 import { API, authenticate, checkStepUp, invalid, newId, now, problem } from './utils'
+import { notify } from '../notify'
 
 /*
   Direct shares and secure links. Granting, changing and revoking access and
@@ -155,6 +156,12 @@ export const sharingHandlers = [
     }
     db.shares.push(share)
     await appendAudit(auth.user.id, 'share.grant', 'file', file.id)
+    notify(to.id, 'share.received', {
+      title: `${auth.user.displayName} shared {file} with you`,
+      body: `${body.role} · the data key is wrapped to your public key`,
+      link: `/files/${file.id}`,
+      fileId: file.id,
+    })
     save()
     return HttpResponse.json(toShareDto(share), { status: 201 })
   }),
@@ -203,6 +210,10 @@ export const sharingHandlers = [
     db.shares = db.shares.filter((s) => !(s.fileId === file.id && s.userId === userId))
     db.wrappedKeys = db.wrappedKeys.filter((w) => !(w.userId === userId && ids.has(w.versionId)))
     await appendAudit(auth.user.id, 'share.revoke', 'file', file.id)
+    notify(userId, 'share.revoked', {
+      title: `${auth.user.displayName} removed your access to a file`,
+      body: 'Your wrapped key copy was deleted.',
+    })
     save()
     return HttpResponse.json({ affectedVersions: affected })
   }),
@@ -374,6 +385,14 @@ export const sharingHandlers = [
     }
     const { link, version } = open
     link.downloads++
+    notify(link.createdBy, 'link.opened', {
+      title: 'Your secure link to {file} was opened',
+      body: link.maxDownloads
+        ? `${link.downloads} of ${link.maxDownloads} opens used`
+        : `${link.downloads} opens so far`,
+      link: `/files/${link.fileId}`,
+      fileId: link.fileId,
+    })
     await appendAudit(actor, 'link.download', 'link', link.id)
     save()
     const body: PublicLinkDownload = {

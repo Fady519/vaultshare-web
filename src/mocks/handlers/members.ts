@@ -13,6 +13,7 @@ import { randomToken } from '../hash'
 import { sendMail } from '../mail'
 import { canManage, committedVersions, roleOf, wrappedKeyFor } from '../fileHelpers'
 import { API, authenticate, checkStepUp, invalid, isEmail, newId, now, problem } from './utils'
+import { notify } from '../notify'
 
 /*
   Members, invitations and the "pending grant": an invitee becomes a member
@@ -88,6 +89,11 @@ export const memberHandlers = [
     }
     m.role = body.role
     await appendAudit(auth.user.id, 'member.role', 'vault', vaultId)
+    notify(m.userId, 'share.role', {
+      title: `Your role in ${db.vaults.find((v) => v.id === vaultId)?.name} is now ${body.role}`,
+      body: `Changed by ${auth.user.displayName}.`,
+      link: `/vaults/${vaultId}`,
+    })
     save()
     return HttpResponse.json(toMemberDto(m))
   }),
@@ -124,6 +130,10 @@ export const memberHandlers = [
       (f) => f.userId !== userId || !versions.some((v) => v.fileId === f.fileId),
     )
     await appendAudit(auth.user.id, 'member.revoke', 'vault', vaultId)
+    notify(userId, 'share.revoked', {
+      title: `${auth.user.displayName} removed you from ${db.vaults.find((v) => v.id === vaultId)?.name}`,
+      body: 'Your wrapped keys for that vault were deleted.',
+    })
     save()
     return HttpResponse.json({ affectedVersions: affected })
   }),
@@ -168,6 +178,11 @@ export const memberHandlers = [
     // someone who already has keys is in right away as "pending", the grant then wraps for them
     if (existing && existing.status === 'active' && existing.publicKey) {
       inv.status = 'accepted'
+      notify(existing.id, 'vault.added', {
+        title: `${auth.user.displayName} added you to ${vault.name}`,
+        body: 'The files open for you as soon as the keys are wrapped to your public key.',
+        link: `/vaults/${vaultId}`,
+      })
       db.members.push({
         vaultId,
         userId: existing.id,
@@ -294,6 +309,11 @@ export const memberHandlers = [
       )
     m.status = 'active'
     await appendAudit(auth.user.id, 'member.add', 'vault', vaultId)
+    notify(user.id, 'vault.added', {
+      title: `Your keys for ${db.vaults.find((v) => v.id === vaultId)?.name} are ready`,
+      body: `${needed.length} data keys wrapped by ${auth.user.displayName}`,
+      link: `/vaults/${vaultId}`,
+    })
     save()
     return new HttpResponse(null, { status: 204 })
   }),

@@ -22,6 +22,7 @@ import {
 } from '../session'
 import { verifyTotp } from '../totp'
 import { API, authenticate, findUserByEmail, invalid, isEmail, newId, now, problem } from './utils'
+import { notify } from '../notify'
 
 const CODE_TTL = 10 * 60_000
 const LINK_TTL = 15 * 60_000
@@ -327,6 +328,11 @@ export const authHandlers = [
       ))
     ) {
       await appendAudit(auth.user.id, 'auth.login_failed', 'user', auth.user.id)
+      notify(auth.user.id, 'security.failed_factor', {
+        title: 'A second-factor code was rejected',
+        body: 'It happened while confirming a sensitive action (step-up).',
+        link: '/settings/security',
+      })
       save()
       return problem(401, 'MFA_INVALID', 'That code did not work.')
     }

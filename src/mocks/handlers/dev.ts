@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw'
 import { fromBase64, toHex } from '@/crypto/encoding'
 import { getBlob, putBlob } from '../blobStore'
-import { db } from '../db'
+import { db, save } from '../db'
 import { currentTotp, secondsLeft } from '../totp'
 
 /*
@@ -11,6 +11,7 @@ import { currentTotp, secondsLeft } from '../totp'
   - /__dev/totp    the current authenticator code for an account
   - /__dev/ping    lets the app check the mock is really the one answering
   - /__dev/tamper  flips one byte of a stored chunk, to show the integrity check failing
+  - /__dev/audit-tamper  edits one audit entry in place, to show the chain check failing
 */
 
 async function chunkState(versionId: string) {
@@ -25,6 +26,27 @@ async function chunkState(versionId: string) {
 }
 
 export const devHandlers = [
+  http.get('/__dev/audit-tamper', () =>
+    HttpResponse.json({ seq: db.audit.find((e) => e.tamperedFrom)?.seq ?? null }),
+  ),
+
+  // what a malicious database admin would do: change history without fixing the hashes
+  http.post('/__dev/audit-tamper', () => {
+    const done = db.audit.find((e) => e.tamperedFrom)
+    if (done) {
+      done.action = done.tamperedFrom!
+      delete done.tamperedFrom
+      save()
+      return HttpResponse.json({ seq: null })
+    }
+    const target = db.audit[Math.floor(db.audit.length / 2)]
+    if (!target) return HttpResponse.json({ seq: null })
+    target.tamperedFrom = target.action
+    target.action = target.action === 'file.download' ? 'file.upload' : 'file.download'
+    save()
+    return HttpResponse.json({ seq: target.seq })
+  }),
+
   http.get('/__dev/ping', () => HttpResponse.json({ mock: true })),
 
   http.get('/__dev/tamper', async ({ request }) => {

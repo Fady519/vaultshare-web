@@ -25,6 +25,7 @@ import {
   wrappedKeyFor,
 } from '../fileHelpers'
 import { API, authenticate, invalid, newId, now, problem } from './utils'
+import { notify } from '../notify'
 
 const MAX_CHUNKS = 1280 // 5 GiB at 4 MiB per chunk, same limit the design shows
 
@@ -172,6 +173,15 @@ export const fileHandlers = [
     file.state = 'active'
     file.updatedAt = version.createdAt
     db.access.push({ userId: auth.user.id, fileId: file.id, action: 'upload', at: now() })
+    if (version.versionNo > 1) {
+      for (const u of needed.filter((x) => x.id !== auth.user.id)) {
+        notify(u.id, 'vault.version', {
+          title: `${auth.user.displayName} committed v${version.versionNo} of {file}`,
+          link: `/files/${file.id}/versions`,
+          fileId: file.id,
+        })
+      }
+    }
     await appendAudit(
       auth.user.id,
       version.versionNo === 1 ? 'file.upload' : 'file.version',

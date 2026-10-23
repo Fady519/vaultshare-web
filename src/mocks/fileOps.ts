@@ -3,6 +3,7 @@ import { db, type MockFile } from './db'
 import { appendAudit } from './audit'
 import { deleteBlob } from './blobStore'
 import { accessOf, canManage, canWrite, purgeAtOf, roleOf } from './fileHelpers'
+import { notify } from './notify'
 
 /*
   The file operations behind both the single endpoints and /files/bulk, so the
@@ -18,6 +19,15 @@ export async function trashFile(file: MockFile, userId: string): Promise<ErrorCo
   file.deletedAt = now()
   file.deletedBy = userId
   await appendAudit(userId, 'file.trash', 'file', file.id)
+  const actor = db.users.find((u) => u.id === userId)?.displayName ?? 'Someone'
+  for (const m of db.members.filter((x) => x.vaultId === file.vaultId && x.userId !== userId)) {
+    notify(m.userId, 'vault.trash', {
+      title: `${actor} moved {file} to trash`,
+      body: 'It can be restored until it is purged.',
+      link: '/trash',
+      fileId: file.id,
+    })
+  }
   return null
 }
 
