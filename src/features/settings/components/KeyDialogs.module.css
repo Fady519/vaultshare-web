@@ -1,0 +1,15 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lead {
+  font: var(--type-body-sm);
+  color: var(--muted);
+}
+
+.busy {
+  font: var(--type-data-sm);
+  color: var(--accent);
+}

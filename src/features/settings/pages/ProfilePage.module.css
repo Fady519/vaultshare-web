@@ -1,0 +1,11 @@
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.name {
+  font: var(--type-h3);
+  font-size: 1.125rem;
+  font-weight: 600;
+}

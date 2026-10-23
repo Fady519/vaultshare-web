@@ -1,0 +1,66 @@
+.item {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 20px 24px;
+  border: 1px solid;
+  border-left-width: 3px;
+  border-radius: var(--radius-card);
+}
+
+.warn {
+  border-color: var(--warn);
+  background: color-mix(in srgb, var(--warn) 7%, transparent);
+}
+
+.danger {
+  border-color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 7%, transparent);
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+}
+
+.text h2 {
+  font: var(--type-body);
+  font-weight: 600;
+}
+
+.warn h2 {
+  color: var(--warn);
+}
+
+.danger h2 {
+  color: var(--danger);
+}
+
+.body {
+  margin-top: 4px;
+  font: var(--type-body-sm);
+  color: var(--muted);
+}
+
+.action {
+  flex: none;
+}
+
+.inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font: var(--type-body-sm);
+  color: var(--muted);
+}
+
+.progressText {
+  font: var(--type-data-sm);
+  color: var(--accent);
+}
