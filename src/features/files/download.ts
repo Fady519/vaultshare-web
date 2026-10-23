@@ -38,6 +38,7 @@ export async function decryptVersion(
   signal?.throwIfAborted()
 
   const parts: Uint8Array[] = []
+  onProgress?.({ stage: 'chunks', chunk: 0, chunkCount: info.chunkCount })
   try {
     for (const c of info.chunks) {
       const ciphertext = await storage.get(c.url, signal)

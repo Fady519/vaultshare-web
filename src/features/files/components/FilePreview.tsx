@@ -46,7 +46,8 @@ export function FilePreview({ blob, mimeType, name, compact }: Props) {
     return (
       <iframe
         title={name}
-        src={url}
+        // chrome's viewer: no thumbnail rail, page fitted to the width
+        src={`${url}#navpanes=0&view=FitH`}
         className={cx(styles.frame, styles.pdf, compact && styles.compact)}
       />
     )

@@ -45,7 +45,10 @@ function downloadSteps(p: DownloadProgress | null, outcome: Outcome): Step[] {
       state: at >= 3 ? 'done' : at === 2 ? 'active' : 'todo',
     },
   ]
-  if (outcome.kind === 'integrity') steps[3].state = 'failed'
+  if (outcome.kind === 'integrity') {
+    steps[2].state = 'failed'
+    steps[3].state = 'failed'
+  }
   if (outcome.kind === 'failed') {
     const i = steps.findIndex((s) => s.state === 'active')
     if (i >= 0) steps[i].state = 'failed'
