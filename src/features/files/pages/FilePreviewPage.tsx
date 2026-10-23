@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
-import { Button, Callout, EmptyState, Skeleton } from '@/components'
+import { Button, Callout, EmptyState, PageHead, Skeleton } from '@/components'
 import { useFileDetail, useFileVersions } from '@/api/files'
 import { errorMessage } from '@/api/client'
 import { fromBase64, IntegrityError, toHex } from '@/crypto'
@@ -10,7 +10,6 @@ import { formatBytes } from '@/utils/format'
 import { useFileName } from '../keys'
 import { canPreview, usePlaintext } from '../plaintext'
 import { DownloadPanel } from '../components/DownloadPanel'
-import { FileHead } from '../components/FileHead'
 import { FilePreview } from '../components/FilePreview'
 import styles from './FilePreviewPage.module.css'
 
@@ -51,8 +50,8 @@ export default function FilePreviewPage() {
 
   return (
     <>
-      <FileHead
-        name={name}
+      <PageHead
+        title={name}
         meta={
           version
             ? `decrypted in this tab  ·  v${version.versionNo}${old ? ' (older version)' : ''}  ·  ${formatBytes(version.sizeBytes)}  ·  never cached to disk`

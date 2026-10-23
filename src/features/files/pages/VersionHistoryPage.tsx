@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Avatar, Button, Callout, SkeletonRows, Tag } from '@/components'
+import { Avatar, Button, Callout, PageHead, SkeletonRows, Tag } from '@/components'
 import { useFileDetail, useFileVersions } from '@/api/files'
 import { useVault } from '@/api/vaults'
 import type { VersionDto } from '@/api/types'
@@ -11,7 +11,6 @@ import { useFileName, useVersionNotes } from '../keys'
 import { canPreview, digestHex, isTextLike, usePlaintext } from '../plaintext'
 import { lineDiff, type LineDiff } from '../diff'
 import { DownloadPanel } from '../components/DownloadPanel'
-import { FileHead } from '../components/FileHead'
 import { RestoreDialog } from '../components/RestoreDialog'
 import { UploadPanel } from '../components/UploadPanel'
 import styles from './VersionHistoryPage.module.css'
@@ -53,8 +52,8 @@ export default function VersionHistoryPage() {
 
   return (
     <>
-      <FileHead
-        name={name}
+      <PageHead
+        title={name}
         meta={
           list.length
             ? `${list.length} version${list.length === 1 ? '' : 's'}  ·  every version separately encrypted  ·  digests over ciphertext`
