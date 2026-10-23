@@ -1,6 +1,7 @@
 import { queryClient } from '@/api/queryClient'
 import { api, errorMessage } from '@/api/client'
 import { fileKeys, filesApi, type MoveRequest } from '@/api/files'
+import { sharingApi } from '@/api/sharing'
 import { vaultKeys } from '@/api/vaults'
 import type { FileDto, MemberDto } from '@/api/types'
 import { toast } from '@/components'
@@ -32,11 +33,16 @@ export async function moveFile(file: FileDto, targetVaultId: string) {
   const privateKey = useSession.getState().privateKey
   if (!privateKey) throw new LockedError()
 
-  const [versions, members] = await Promise.all([
+  const [versions, members, shares] = await Promise.all([
     filesApi.versions(file.id),
     api.get<MemberDto[]>(`/vaults/${targetVaultId}/members`),
+    sharingApi.fileShares(file.id),
   ])
-  const recipients = members.filter((m) => m.status === 'active' && m.publicKey)
+  // direct shares travel with the file
+  const recipients = [
+    ...members.filter((m) => m.status === 'active' && m.publicKey),
+    ...shares.filter((sh) => !members.some((m) => m.userId === sh.userId)),
+  ]
   const keyVersionOf = new Map(recipients.map((m) => [m.userId, m.keyVersion]))
 
   const wrappedKeys: MoveRequest['wrappedKeys'] = []

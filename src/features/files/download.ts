@@ -1,5 +1,5 @@
 import { filesApi, storage } from '@/api/files'
-import type { DownloadResponse } from '@/api/types'
+import type { ChunkMeta, DownloadResponse } from '@/api/types'
 import {
   chunkAad,
   DecryptError,
@@ -37,10 +37,29 @@ export async function decryptVersion(
   const key = await dataKeyFor(info.wrappedKey)
   signal?.throwIfAborted()
 
+  const blob = await decryptChunks(fileId, versionId, key, info, onProgress, signal)
+  return { blob, info }
+}
+
+type ChunkSource = {
+  mimeType: string
+  chunkCount: number
+  chunks: (ChunkMeta & { url: string })[]
+}
+
+// the shared part: fetch each chunk, check digest then tag, stop at the first failure
+export async function decryptChunks(
+  fileId: string,
+  versionId: string,
+  key: CryptoKey,
+  source: ChunkSource,
+  onProgress?: (p: DownloadProgress) => void,
+  signal?: AbortSignal,
+) {
   const parts: Uint8Array[] = []
-  onProgress?.({ stage: 'chunks', chunk: 0, chunkCount: info.chunkCount })
+  onProgress?.({ stage: 'chunks', chunk: 0, chunkCount: source.chunkCount })
   try {
-    for (const c of info.chunks) {
+    for (const c of source.chunks) {
       const ciphertext = await storage.get(c.url, signal)
       if (toBase64(await sha256(ciphertext)) !== c.digest) {
         throw new IntegrityError(c.index, 'the stored bytes do not match their digest')
@@ -59,15 +78,15 @@ export async function decryptVersion(
           throw new IntegrityError(c.index, 'the authentication tag was rejected')
         throw err
       }
-      onProgress?.({ stage: 'chunks', chunk: c.index + 1, chunkCount: info.chunkCount })
+      onProgress?.({ stage: 'chunks', chunk: c.index + 1, chunkCount: source.chunkCount })
     }
   } catch (err) {
     parts.forEach((p) => p.fill(0))
     throw err
   }
 
-  onProgress?.({ stage: 'done', chunk: info.chunkCount, chunkCount: info.chunkCount })
-  return { blob: new Blob(parts, { type: info.mimeType }), info }
+  onProgress?.({ stage: 'done', chunk: source.chunkCount, chunkCount: source.chunkCount })
+  return new Blob(parts, { type: source.mimeType })
 }
 
 // hand the decrypted file to the browser's download, then forget the URL

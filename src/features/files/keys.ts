@@ -32,6 +32,12 @@ export function dataKeyFor(wrapped: WrappedKeyDto) {
   return key
 }
 
+// after a key rotation the cached key for that version is the old one
+export function forgetDataKey(versionId: string) {
+  keys.delete(versionId)
+  queryClient.removeQueries({ queryKey: ['plaintext', versionId] })
+}
+
 useSession.subscribe((state, prev) => {
   if (prev.privateKey && !state.privateKey) {
     keys.clear()

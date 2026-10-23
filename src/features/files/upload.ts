@@ -1,5 +1,6 @@
 import { filesApi, storage } from '@/api/files'
 import { api } from '@/api/client'
+import { sharingApi } from '@/api/sharing'
 import type { ChunkMeta, FileDto, MemberDto, NewWrappedKey } from '@/api/types'
 import {
   CHUNK_SIZE,
@@ -83,7 +84,12 @@ export async function uploadFile(opts: UploadOptions): Promise<FileDto> {
   }
 
   const members = await api.get<MemberDto[]>(`/vaults/${vaultId}/members`)
-  const recipients = members.filter((m) => m.status === 'active' && m.publicKey)
+  // a new version of a shared file must stay readable for the people it was shared with
+  const shares = opts.fileId ? await sharingApi.fileShares(opts.fileId) : []
+  const recipients = [
+    ...members.filter((m) => m.status === 'active' && m.publicKey),
+    ...shares.filter((sh) => !members.some((m) => m.userId === sh.userId)),
+  ]
 
   const init = await filesApi.initUpload(vaultId, {
     fileId: opts.fileId ?? null,
