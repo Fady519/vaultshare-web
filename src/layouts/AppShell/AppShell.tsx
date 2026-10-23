@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import { useIdleLock } from '@/hooks/useIdleLock'
 import { useSession } from '@/store/session'
+import { StepUpHost } from '@/features/auth/components/StepUpHost'
 import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
 import { UnlockPanel } from './UnlockPanel'
@@ -23,6 +24,7 @@ export function AppShell() {
           <div className={styles.content}>{unlocked ? <Outlet /> : <UnlockPanel />}</div>
         </main>
       </div>
+      <StepUpHost />
     </div>
   )
 }

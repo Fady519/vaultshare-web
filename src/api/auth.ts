@@ -14,6 +14,8 @@ import type {
   RecoveryVerifyResponse,
   RegisterRequest,
   SessionResponse,
+  StepUpRequest,
+  StepUpResponse,
   TotpSetupResponse,
   VerifyEmailRequest,
 } from './types'
@@ -39,6 +41,9 @@ export const authApi = {
     api.post<RecoveryVerifyResponse>('/auth/recovery/verify', { token }),
   recoveryComplete: (body: RecoveryCompleteRequest) =>
     api.post<void>('/auth/recovery/complete', body),
+
+  // FR-17: a short-lived token for one sensitive action, sent back as X-Step-Up-Token
+  stepUp: (body: StepUpRequest) => api.post<StepUpResponse>('/auth/step-up', body),
 }
 
 export const keysApi = {
