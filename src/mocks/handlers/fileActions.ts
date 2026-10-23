@@ -2,7 +2,7 @@ import { delay, http, HttpResponse } from 'msw'
 import type { ErrorCode } from '@/api/types'
 import { db, save, type MockFile } from '../db'
 import { appendAudit } from '../audit'
-import { canWrite, committedVersions, roleOf, toFileDto } from '../fileHelpers'
+import { accessOf, canWrite, committedVersions, holdersOf, roleOf, toFileDto } from '../fileHelpers'
 import { purgeFile, restoreFile, setFavorite, trashFile } from '../fileOps'
 import { API, authenticate, invalid, problem } from './utils'
 
@@ -21,7 +21,7 @@ function failWith(code: ErrorCode) {
 
 function findFile(fileId: string, userId: string): MockFile | null {
   const file = db.files.find((f) => f.id === fileId && f.state !== 'uploading')
-  return file && roleOf(file.vaultId, userId) ? file : null
+  return file && accessOf(file, userId) ? file : null
 }
 
 type MoveBody = {
@@ -37,7 +37,7 @@ export const fileActionHandlers = [
     if (auth.error) return auth.error
     const file = findFile(String(params.fileId), auth.user.id)
     if (!file || file.state !== 'active') return failWith('NOT_FOUND')
-    if (!canWrite(roleOf(file.vaultId, auth.user.id))) return failWith('FORBIDDEN_ROLE')
+    if (!canWrite(accessOf(file, auth.user.id))) return failWith('FORBIDDEN_ROLE')
 
     const body = (await request.json()) as { encName?: string; nameIv?: string }
     if (!body.encName || !body.nameIv) return invalid('encName', 'encName and nameIv are required.')
@@ -74,10 +74,8 @@ export const fileActionHandlers = [
     }
 
     const versions = committedVersions(file.id)
-    const recipients = db.members
-      .filter((m) => m.vaultId === target.id && m.status === 'active')
-      .map((m) => db.users.find((u) => u.id === m.userId)!)
-      .filter((u) => u.publicKey)
+    // the target vault's members, plus whoever the file is shared with directly
+    const recipients = holdersOf(file.id, target.id)
     const given = body.wrappedKeys ?? []
     const missing = versions.some((v) =>
       recipients.some((r) => !given.some((k) => k.versionId === v.id && k.userId === r.id)),

@@ -167,6 +167,46 @@ export type MockWrappedKey = {
 
 export type MockFavorite = { userId: string; fileId: string }
 
+// a file shared straight with someone outside its vault
+export type MockShare = {
+  fileId: string
+  userId: string
+  role: 'viewer' | 'editor'
+  sharedBy: string
+  sharedAt: string
+  expiresAt: string | null
+}
+
+export type MockLink = {
+  id: string
+  token: string
+  fileId: string
+  versionId: string
+  createdBy: string
+  // data key sealed under the key in the URL fragment; dropped on revoke
+  reWrapped: string | null
+  passphraseSalt: string | null
+  encName: string
+  nameIv: string
+  expiresAt: string
+  // 0 = no limit
+  maxDownloads: number
+  downloads: number
+  requireSignIn: boolean
+  allowDownload: boolean
+  revoked: boolean
+  createdAt: string
+}
+
+// a version being re-encrypted under a fresh key (after a revoke)
+export type MockRekey = {
+  id: string
+  versionId: string
+  storagePfx: string
+  chunkCount: number
+  createdBy: string
+}
+
 export type MockAccess = {
   userId: string
   fileId: string
@@ -197,10 +237,13 @@ export type MockDb = {
   wrappedKeys: MockWrappedKey[]
   favorites: MockFavorite[]
   access: MockAccess[]
+  shares: MockShare[]
+  links: MockLink[]
+  rekeys: MockRekey[]
 }
 
 // bump when the shape changes, old local data gets reseeded
-const DB_VERSION = 4
+const DB_VERSION = 5
 const STORAGE_KEY = 'vaultshare.mock-db'
 
 export let db = {} as MockDb

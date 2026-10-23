@@ -2,7 +2,7 @@ import type { BulkAction, ErrorCode } from '@/api/types'
 import { db, type MockFile } from './db'
 import { appendAudit } from './audit'
 import { deleteBlob } from './blobStore'
-import { canManage, canWrite, purgeAtOf, roleOf } from './fileHelpers'
+import { accessOf, canManage, canWrite, purgeAtOf, roleOf } from './fileHelpers'
 
 /*
   The file operations behind both the single endpoints and /files/bulk, so the
@@ -47,6 +47,8 @@ export async function purgeFile(file: MockFile, userId: string | null): Promise<
   db.versions = db.versions.filter((v) => v.fileId !== file.id)
   db.favorites = db.favorites.filter((f) => f.fileId !== file.id)
   db.access = db.access.filter((a) => a.fileId !== file.id)
+  db.shares = db.shares.filter((x) => x.fileId !== file.id)
+  db.links = db.links.filter((l) => l.fileId !== file.id)
   db.files = db.files.filter((f) => f.id !== file.id)
   // audit entries stay: the chain is append-only
   await appendAudit(userId, 'file.purge', 'file', file.id)
@@ -54,7 +56,7 @@ export async function purgeFile(file: MockFile, userId: string | null): Promise<
 }
 
 export function setFavorite(file: MockFile, userId: string, on: boolean): ErrorCode | null {
-  if (!roleOf(file.vaultId, userId)) return 'NOT_FOUND'
+  if (!accessOf(file, userId)) return 'NOT_FOUND'
   db.favorites = db.favorites.filter((f) => !(f.userId === userId && f.fileId === file.id))
   if (on) db.favorites.push({ userId, fileId: file.id })
   return null

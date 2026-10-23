@@ -199,6 +199,8 @@ export type VaultDto = {
   description: string
   ownerId: Guid
   role: VaultRole
+  // pending = invited, but nobody has wrapped the vault's keys for me yet
+  myStatus: 'active' | 'pending'
   fileCount: number
   memberCount: number
   sizeBytes: number
@@ -249,15 +251,26 @@ export type InvitationPreviewDto = {
 export type PendingGrantDto = {
   invitationId: Guid
   vaultId: Guid
+  vaultName: string
+  role: VaultRole
   recipient: {
     userId: Guid
+    email: string
     displayName: string
     publicKey: Base64
     keyVersion: number
     fingerprint: string
   }
+  // every version in the vault, each with the caller's own wrapped key to re-wrap from
   versions: { fileId: Guid; versionId: Guid; wrappedKey: WrappedKeyDto }[]
 }
+
+export type InviteRequest = { email: string; role: VaultRole; message?: string }
+
+export type CompleteGrantRequest = { wrappedKeys: NewVersionKey[] }
+
+// one wrapped key for one version and one person (grants, shares, moves)
+export type NewVersionKey = { versionId: Guid; userId: Guid; keyVersion: number; wrapped: Base64 }
 
 // ---------- files ----------
 
@@ -321,6 +334,9 @@ export type FileDetailDto = {
   wrappedKeyCount: number
   versionCount: number
   recentActivity: AuditEntryDto[]
+  // the caller's own role, and whether it comes from the vault or a direct share
+  myRole: VaultRole
+  via: 'vault' | 'share'
 }
 
 export type UploadInitRequest = {
@@ -371,29 +387,63 @@ export type AffectedVersions = { affectedVersions: { fileId: Guid; versionId: Gu
 
 // ---------- sharing & links ----------
 
-export type ShareDto = { userId: Guid; role: VaultRole; sharedAt: IsoDate }
+export type ShareRole = 'viewer' | 'editor'
+
+export type ShareDto = {
+  userId: Guid
+  role: ShareRole
+  sharedAt: IsoDate
+  expiresAt: IsoDate | null
+}
+
+// GET /files/{id}/shares: everyone the file was shared with directly, with what's needed to wrap for them
+export type FileShareDto = ShareDto & {
+  email: string
+  displayName: string
+  sharedBy: Person
+  publicKey: Base64
+  keyVersion: number
+  fingerprint: string
+}
+
+export type CreateShareRequest = {
+  userId: Guid
+  role: ShareRole
+  expiresAt: IsoDate | null
+  // one per committed version of the file
+  wrappedKeys: { versionId: Guid; keyVersion: number; wrapped: Base64 }[]
+}
 
 export type IncomingShare = {
   file: FileDto
   sharedBy: Person & { email: string }
-  role: VaultRole
+  role: ShareRole
   sharedAt: IsoDate
+  expiresAt: IsoDate | null
 }
 
 export type OutgoingShare = {
   file: FileDto
   recipient: Person & { email: string }
-  role: VaultRole
+  role: ShareRole
   sharedAt: IsoDate
+  expiresAt: IsoDate | null
   lastUsedAt: IsoDate | null
 }
 
 export type CreateLinkRequest = {
   versionId: Guid
+  // the data key sealed under the key in the link's #fragment (+ passphrase)
   reWrapped: Base64
-  expiresAt: IsoDate
-  maxDownloads: number
   passphraseSalt: Base64 | null
+  // the name sealed with this version's key, so the link keeps working after new versions
+  encName: Base64
+  nameIv: Base64
+  expiresAt: IsoDate
+  // 0 = no limit
+  maxDownloads: number
+  requireSignIn: boolean
+  allowDownload: boolean
 }
 
 export type LinkDto = {
@@ -405,20 +455,47 @@ export type LinkDto = {
   maxDownloads: number
   downloads: number
   hasPassphrase: boolean
+  requireSignIn: boolean
+  allowDownload: boolean
   revoked: boolean
   createdAt: IsoDate
 }
 
 export type PublicLinkDto = {
+  fileId: Guid
   versionId: Guid
   mimeType: string
   sizeBytes: number
+  chunkCount: number
   encName: Base64
   nameIv: Base64
   reWrapped: Base64
   passphraseSalt: Base64 | null
   expiresAt: IsoDate
-  downloadsLeft: number
+  // null = no limit
+  downloadsLeft: number | null
+  allowDownload: boolean
+}
+
+export type PublicLinkDownload = { chunks: (ChunkMeta & { url: string })[] }
+
+// re-keying one version after someone lost access
+export type RekeyInitResponse = {
+  rekeyId: Guid
+  uploadUrls: { index: number; url: string }[]
+  // who must get the new key: the vault's members + direct shares, as of now
+  recipients: { userId: Guid; publicKey: Base64; keyVersion: number }[]
+}
+
+export type RekeyCommitRequest = {
+  chunks: ChunkMeta[]
+  digest: Base64
+  wrappedKeys: NewWrappedKey[]
+  // sealed again under the new key: the note always, the name if this is the current version
+  encNote?: Base64
+  noteIv?: Base64
+  encName?: Base64
+  nameIv?: Base64
 }
 
 // ---------- settings, team, admin ----------

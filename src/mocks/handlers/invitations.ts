@@ -27,7 +27,7 @@ export const invitationHandlers = [
       inviterName: inviter.displayName,
       inviterEmail: inviter.email,
       expiresAt: inv.expiresAt,
-      fileCount: 0,
+      fileCount: db.files.filter((f) => f.vaultId === vault.id && f.state === 'active').length,
       memberCount: db.members.filter((m) => m.vaultId === vault.id).length,
     }
     return HttpResponse.json(body)

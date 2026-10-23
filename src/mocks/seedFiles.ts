@@ -1,4 +1,5 @@
-import { concatBytes, fromHex, toBase64, toHex, utf8 } from '@/crypto/encoding'
+import { concatBytes, fromHex, toBase64, toBase64Url, toHex, utf8 } from '@/crypto/encoding'
+import { sealForLink } from '@/crypto/links'
 import {
   chunkAad,
   encryptChunk,
@@ -16,6 +17,8 @@ import type {
   MockFile,
   MockAccess,
   MockFavorite,
+  MockLink,
+  MockShare,
   MockVersion,
   MockWrappedKey,
 } from './db'
@@ -28,7 +31,16 @@ import { makeCsv, makeLogoSvg, makeMarkdown, makePdf, makeText } from './sampleC
   the same thing the members' browsers would have done when they uploaded.
 */
 
-type Who = 'jack' | 'maya' | 'ilan'
+type Who = 'jack' | 'maya' | 'ilan' | 'sam'
+
+/*
+  One working secure link in the demo data, on contract-northgate-2026.pdf.
+  The key below is what would normally only ever exist in the link itself;
+  it's fixed here so the README can print a link that opens.
+*/
+export const DEMO_LINK_TOKEN = 'demoLink2026Nq4vXr8TkP2mW7sYb3Hd'
+const DEMO_LINK_KEY = fromHex('9f3c1a77e0b45d2288ac31f05d41402abc4b2a76b9719d91c48a2cc98436a10b')
+export const DEMO_LINK_FRAGMENT = toBase64Url(DEMO_LINK_KEY)
 type SeedVersion = { by: Who; hoursAgo: number; note?: string; content: Uint8Array }
 type SeedFile = {
   name: string
@@ -39,6 +51,16 @@ type SeedFile = {
   opened?: { by: Who; hoursAgo: number }[]
   // in the trash since then; purged RETENTION_DAYS later
   trashed?: { by: Who; hoursAgo: number }
+  // shared straight with someone outside the vault
+  shares?: {
+    to: Who
+    by: Who
+    role: 'viewer' | 'editor'
+    hoursAgo: number
+    expiresInDays?: number
+  }[]
+  // the demo secure link
+  link?: boolean
 }
 
 const PDF = 'application/pdf'
@@ -66,6 +88,7 @@ function plan(): Record<string, SeedFile[]> {
         name: 'contract-northgate-2026.pdf',
         mime: PDF,
         favorite: true,
+        link: true,
         opened: [{ by: 'jack', hoursAgo: 3 }],
         versions: [
           {
@@ -336,6 +359,7 @@ function plan(): Record<string, SeedFile[]> {
       {
         name: 'api-threat-model.md',
         mime: MD,
+        shares: [{ to: 'maya', by: 'jack', role: 'viewer', hoursAgo: 70, expiresInDays: 25 }],
         favorite: true,
         versions: [1, 2].map((rev, i) => ({
           by: (i ? 'ilan' : 'jack') as Who,
@@ -365,6 +389,8 @@ function plan(): Record<string, SeedFile[]> {
       {
         name: 'release-checklist.txt',
         mime: TXT,
+        shares: [{ to: 'sam', by: 'jack', role: 'viewer', hoursAgo: 28, expiresInDays: 5 }],
+        opened: [{ by: 'sam', hoursAgo: 4 }],
         versions: [
           {
             by: 'jack',
@@ -413,6 +439,7 @@ function plan(): Record<string, SeedFile[]> {
       {
         name: 'resolutions-draft.md',
         mime: MD,
+        shares: [{ to: 'ilan', by: 'jack', role: 'editor', hoursAgo: 6 }],
         versions: [1, 2].map((rev, i) => ({
           by: 'jack' as Who,
           hoursAgo: 48 - i * 40,
@@ -421,6 +448,47 @@ function plan(): Record<string, SeedFile[]> {
             'Appoint audit committee',
           ]),
         })),
+      },
+    ],
+    deals: [
+      {
+        name: 'northgate-msa-final.pdf',
+        mime: PDF,
+        shares: [{ to: 'jack', by: 'maya', role: 'editor', hoursAgo: 2, expiresInDays: 30 }],
+        versions: [1, 2].map((rev, i) => ({
+          by: 'maya' as Who,
+          hoursAgo: 120 - i * 100,
+          note: ['Draft for Northgate', 'Signed copy'][i],
+          content: makePdf('Master services agreement', `Northgate - final (rev ${rev})`, [
+            {
+              heading: 'Term',
+              body: 'Two years from signature, renewing yearly unless cancelled in writing.',
+            },
+          ]),
+        })),
+      },
+      {
+        name: 'q2-budget-consolidated.csv',
+        mime: CSV,
+        shares: [
+          { to: 'jack', by: 'ilan', role: 'viewer', hoursAgo: 26 },
+          { to: 'sam', by: 'ilan', role: 'viewer', hoursAgo: 50, expiresInDays: 5 },
+        ],
+        opened: [{ by: 'sam', hoursAgo: 20 }],
+        versions: [
+          {
+            by: 'ilan',
+            hoursAgo: 60,
+            content: makeCsv(
+              ['team', 'q2_budget_eur', 'spent_eur'],
+              [
+                ['Legal', 120000, 64000],
+                ['Engineering', 410000, 233000],
+                ['Board', 30000, 8000],
+              ],
+            ),
+          },
+        ],
       },
     ],
     personal: [
@@ -455,6 +523,8 @@ export async function seedFiles(
   const wrappedKeys: MockWrappedKey[] = []
   const favorites: MockFavorite[] = []
   const access: MockAccess[] = []
+  const shares: MockShare[] = []
+  const links: MockLink[] = []
   const events: Omit<MockAudit, 'seq' | 'prevHash' | 'hash'>[] = []
   const now = Date.now()
   const at = (h: number) => new Date(now - h * 3_600_000).toISOString()
@@ -467,6 +537,10 @@ export async function seedFiles(
 
     for (const seed of list) {
       const fileId = crypto.randomUUID()
+      const holders = [
+        ...recipients,
+        ...(seed.shares ?? []).map((sh) => base.users.find((u) => u.id === userIds[sh.to])!),
+      ]
       const ordered = [...seed.versions].sort((a, b) => b.hoursAgo - a.hoursAgo)
       let last: { enc: string; iv: string } = { enc: '', iv: '' }
 
@@ -477,12 +551,34 @@ export async function seedFiles(
         const sealed = await encryptChunk(key, v.content, chunkAad(fileId, versionId, 0))
         await putBlob(`${storagePfx}/0`, sealed.ciphertext)
 
-        for (const r of recipients) {
+        for (const r of holders) {
           wrappedKeys.push({
             versionId,
             userId: r.id,
             keyVersion: r.keyVersion,
             wrapped: await wrapDataKey(raw, r.publicKey),
+          })
+        }
+        if (seed.link && i === ordered.length - 1) {
+          const forLink = await sealForLink(raw, versionId, DEMO_LINK_KEY)
+          const linkName = await encryptText(key, seed.name, nameAad(fileId))
+          links.push({
+            id: crypto.randomUUID(),
+            token: DEMO_LINK_TOKEN,
+            fileId,
+            versionId,
+            createdBy: userIds.jack,
+            reWrapped: forLink.reWrapped,
+            passphraseSalt: null,
+            encName: linkName.enc,
+            nameIv: linkName.iv,
+            expiresAt: new Date(now + 30 * 86_400_000).toISOString(),
+            maxDownloads: 25,
+            downloads: 0,
+            requireSignIn: false,
+            allowDownload: true,
+            revoked: false,
+            createdAt: at(1),
           })
         }
         raw.fill(0)
@@ -546,6 +642,25 @@ export async function seedFiles(
           resourceId: fileId,
         })
       }
+      for (const sh of seed.shares ?? []) {
+        shares.push({
+          fileId,
+          userId: userIds[sh.to],
+          role: sh.role,
+          sharedBy: userIds[sh.by],
+          sharedAt: at(sh.hoursAgo),
+          expiresAt: sh.expiresInDays
+            ? new Date(now + sh.expiresInDays * 86_400_000).toISOString()
+            : null,
+        })
+        events.push({
+          timestamp: at(sh.hoursAgo),
+          actorId: userIds[sh.by],
+          action: 'share.grant',
+          resourceType: 'file',
+          resourceId: fileId,
+        })
+      }
       if (seed.trashed) {
         events.push({
           timestamp: at(seed.trashed.hoursAgo),
@@ -558,7 +673,18 @@ export async function seedFiles(
     }
   }
 
-  return { files, versions, chunks, wrappedKeys, favorites, access, audit: await chain(events) }
+  return {
+    files,
+    versions,
+    chunks,
+    wrappedKeys,
+    favorites,
+    access,
+    shares,
+    links,
+    rekeys: [],
+    audit: await chain(events),
+  }
 }
 
 // the uploads above as an audit trail, hash-chained the same way appendAudit does it

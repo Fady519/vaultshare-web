@@ -20,6 +20,8 @@ const ID = {
   eng: '0b9e7d55-2f3a-4c1b-8e6d-1a2b3c4d5e02',
   board: '0b9e7d55-2f3a-4c1b-8e6d-1a2b3c4d5e03',
   personal: '0b9e7d55-2f3a-4c1b-8e6d-1a2b3c4d5e04',
+  // Maya's, so Jack has files that were shared with him rather than vault access
+  deals: '0b9e7d55-2f3a-4c1b-8e6d-1a2b3c4d5e05',
 }
 
 // the codes from figma screen 07, so the "use a recovery code" path can be demoed
@@ -87,8 +89,14 @@ function totp(name: SeedName, userId: string): MockFactor {
   }
 }
 
-function vault(id: string, name: string, description: string, createdAt: string): MockVault {
-  return { id, name, description, ownerId: ID.jack, createdAt }
+function vault(
+  id: string,
+  name: string,
+  description: string,
+  createdAt: string,
+  ownerId = ID.jack,
+): MockVault {
+  return { id, name, description, ownerId, createdAt }
 }
 
 function member(vaultId: string, userId: string, role: MockMember['role']): MockMember {
@@ -126,6 +134,13 @@ export async function seed(): Promise<Omit<MockDb, 'version'>> {
       ),
       vault(ID.board, 'Board 2026', 'Board packs and minutes.', '2026-01-20T12:00:00.000Z'),
       vault(ID.personal, 'Personal', 'Only me.', '2026-01-10T09:05:00.000Z'),
+      vault(
+        ID.deals,
+        'Partner deals',
+        'Maya and Ilan. Single files get shared out.',
+        '2026-02-02T09:00:00.000Z',
+        ID.maya,
+      ),
     ],
     members: [
       member(ID.legal, ID.jack, 'owner'),
@@ -137,13 +152,15 @@ export async function seed(): Promise<Omit<MockDb, 'version'>> {
       member(ID.board, ID.jack, 'owner'),
       member(ID.board, ID.maya, 'viewer'),
       member(ID.personal, ID.jack, 'owner'),
+      member(ID.deals, ID.maya, 'owner'),
+      member(ID.deals, ID.ilan, 'editor'),
     ],
   }
 
   const fileTables = await seedFiles(
     base,
-    { legal: ID.legal, eng: ID.eng, board: ID.board, personal: ID.personal },
-    { jack: ID.jack, maya: ID.maya, ilan: ID.ilan },
+    { legal: ID.legal, eng: ID.eng, board: ID.board, personal: ID.personal, deals: ID.deals },
+    { jack: ID.jack, maya: ID.maya, ilan: ID.ilan, sam: ID.sam },
   )
 
   return {

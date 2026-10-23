@@ -6,7 +6,10 @@ import { invitationHandlers } from './invitations'
 import { keyHandlers } from './keys'
 import { libraryHandlers } from './library'
 import { meHandlers } from './me'
+import { memberHandlers } from './members'
 import { mfaHandlers } from './mfa'
+import { rekeyHandlers } from './rekey'
+import { sharingHandlers } from './sharing'
 import { vaultHandlers } from './vaults'
 
 // one file per area of the API, same split as src/api
@@ -20,6 +23,9 @@ export const handlers = [
   ...libraryHandlers,
   ...fileHandlers,
   ...fileActionHandlers,
+  ...sharingHandlers,
+  ...memberHandlers,
+  ...rekeyHandlers,
   ...storageHandlers,
   ...invitationHandlers,
   ...devHandlers,

@@ -1,14 +1,23 @@
 import { delay, http, HttpResponse } from 'msw'
-import type { AuditEntryDto, CommitRequest, FileDetailDto, UploadInitRequest } from '@/api/types'
+import type {
+  AuditEntryDto,
+  CommitRequest,
+  FileAccessEntry,
+  FileDetailDto,
+  UploadInitRequest,
+} from '@/api/types'
 import { db, save } from '../db'
 import { appendAudit } from '../audit'
 import { deleteBlob, getBlob, putBlob } from '../blobStore'
 import { purgeExpired } from '../fileOps'
 import {
+  accessOf,
   canWrite,
   committedVersions,
   currentVersion,
+  holdersOf,
   roleOf,
+  shareOf,
   storageUrl,
   toFileDto,
   toVersionDto,
@@ -19,9 +28,10 @@ import { API, authenticate, invalid, newId, now, problem } from './utils'
 
 const MAX_CHUNKS = 1280 // 5 GiB at 4 MiB per chunk, same limit the design shows
 
+// members of the vault, or someone the file was shared with
 function findFileFor(fileId: string, userId: string) {
   const file = db.files.find((f) => f.id === fileId && f.state !== 'uploading')
-  if (!file || !roleOf(file.vaultId, userId)) return null
+  if (!file || !accessOf(file, userId)) return null
   return file
 }
 
@@ -50,12 +60,15 @@ export const fileHandlers = [
     const auth = authenticate(request)
     if (auth.error) return auth.error
     const vaultId = String(params.vaultId)
-    const role = roleOf(vaultId, auth.user.id)
+    const body = (await request.json()) as UploadInitRequest
+    // new files need a vault role; a new version of a shared file is fine with an editor share
+    const role =
+      roleOf(vaultId, auth.user.id) ??
+      (body.fileId ? shareOf(body.fileId, auth.user.id)?.role : undefined)
     if (!role) return problem(404, 'NOT_FOUND', 'Vault not found.')
     if (!canWrite(role))
       return problem(403, 'FORBIDDEN_ROLE', 'Viewers can read files but not upload.')
 
-    const body = (await request.json()) as UploadInitRequest
     if (!Number.isInteger(body.chunkCount) || body.chunkCount < 1 || body.chunkCount > MAX_CHUNKS) {
       return invalid('chunkCount', 'Files are limited to 5 GB.')
     }
@@ -135,11 +148,8 @@ export const fileHandlers = [
       }
     }
 
-    // every member who can hold a key must get one, or they'd be locked out of this version
-    const needed = db.members
-      .filter((m) => m.vaultId === file.vaultId && m.status === 'active')
-      .map((m) => db.users.find((u) => u.id === m.userId)!)
-      .filter((u) => u.publicKey)
+    // every member (and everyone it's shared with) must get a key, or they'd be locked out
+    const needed = holdersOf(file.id, file.vaultId)
     const given = new Set((body.wrappedKeys ?? []).map((k) => k.userId))
     const missing = needed.filter((u) => !given.has(u.id))
     if (missing.length) {
@@ -197,19 +207,29 @@ export const fileHandlers = [
     if (!file || !dto) return problem(404, 'NOT_FOUND', 'File not found.')
 
     const current = currentVersion(file.id)!
-    const access = db.members
-      .filter((m) => m.vaultId === file.vaultId)
-      .map((m) => {
-        const u = db.users.find((x) => x.id === m.userId)!
-        return {
-          userId: u.id,
-          displayName: u.displayName,
-          email: u.email,
+    const person = (id: string) => db.users.find((x) => x.id === id)!
+    const access: FileAccessEntry[] = [
+      ...db.members
+        .filter((m) => m.vaultId === file.vaultId)
+        .map((m) => ({
+          userId: m.userId,
+          displayName: person(m.userId).displayName,
+          email: person(m.userId).email,
           role: m.role,
           source: 'vault' as const,
-          hasKey: Boolean(wrappedKeyFor(current.id, u.id)),
-        }
-      })
+          hasKey: Boolean(wrappedKeyFor(current.id, m.userId)),
+        })),
+      ...db.shares
+        .filter((sh) => sh.fileId === file.id && shareOf(file.id, sh.userId))
+        .map((sh) => ({
+          userId: sh.userId,
+          displayName: person(sh.userId).displayName,
+          email: person(sh.userId).email,
+          role: sh.role,
+          source: 'share' as const,
+          hasKey: Boolean(wrappedKeyFor(current.id, sh.userId)),
+        })),
+    ]
     const recentActivity: AuditEntryDto[] = db.audit
       .filter((e) => e.resourceId === file.id)
       .slice(-5)
@@ -222,6 +242,8 @@ export const fileHandlers = [
       wrappedKeyCount: db.wrappedKeys.filter((w) => w.versionId === current.id).length,
       versionCount: committedVersions(file.id).length,
       recentActivity,
+      myRole: accessOf(file, auth.user.id)!,
+      via: roleOf(file.vaultId, auth.user.id) ? 'vault' : 'share',
     }
     return HttpResponse.json(body)
   }),

@@ -1,5 +1,5 @@
 import type { FileDto, VaultRole, VersionDto, WrappedKeyDto } from '@/api/types'
-import { db, type MockFile, type MockVersion } from './db'
+import { db, type MockFile, type MockShare, type MockVersion } from './db'
 
 // days a trashed file waits before it's purged (admin setting in phase 6)
 export const RETENTION_DAYS = 30
@@ -11,6 +11,26 @@ export const canWrite = (role?: VaultRole) =>
   role === 'owner' || role === 'manager' || role === 'editor'
 
 export const canManage = (role?: VaultRole) => role === 'owner' || role === 'manager'
+
+// a direct share that hasn't run out
+export function shareOf(fileId: string, userId: string): MockShare | undefined {
+  const s = db.shares.find((x) => x.fileId === fileId && x.userId === userId)
+  return s && (!s.expiresAt || s.expiresAt > new Date().toISOString()) ? s : undefined
+}
+
+// what someone may do with a file: their vault role, or else what was shared with them
+export function accessOf(file: MockFile, userId: string): VaultRole | undefined {
+  return roleOf(file.vaultId, userId) ?? shareOf(file.id, userId)?.role
+}
+
+// everyone who must get a wrapped key for a new version (or a re-keyed one)
+export function holdersOf(fileId: string, vaultId: string) {
+  const ids = new Set(
+    db.members.filter((m) => m.vaultId === vaultId && m.status === 'active').map((m) => m.userId),
+  )
+  for (const s of db.shares) if (s.fileId === fileId && shareOf(fileId, s.userId)) ids.add(s.userId)
+  return db.users.filter((u) => ids.has(u.id) && u.publicKey)
+}
 
 export const purgeAtOf = (deletedAt: string) =>
   new Date(new Date(deletedAt).getTime() + RETENTION_DAYS * 86_400_000).toISOString()

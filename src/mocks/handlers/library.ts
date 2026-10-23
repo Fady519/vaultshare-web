@@ -1,7 +1,7 @@
 import { delay, http, HttpResponse } from 'msw'
 import type { BulkAction, BulkResponse, ErrorCode, RecentEntry } from '@/api/types'
 import { db, save } from '../db'
-import { roleOf, toFileDto } from '../fileHelpers'
+import { accessOf, roleOf, toFileDto } from '../fileHelpers'
 import { purgeExpired, runBulk } from '../fileOps'
 import { API, authenticate, invalid } from './utils'
 
@@ -13,8 +13,12 @@ import { API, authenticate, invalid } from './utils'
 
 const BULK_ACTIONS: BulkAction[] = ['trash', 'restore', 'purge', 'favorite', 'unfavorite']
 
+// active files include the ones shared with me; the trash is per vault
 const mine = (userId: string, state: 'active' | 'trashed') =>
-  db.files.filter((f) => f.state === state && roleOf(f.vaultId, userId))
+  db.files.filter(
+    (f) =>
+      f.state === state && (state === 'active' ? accessOf(f, userId) : roleOf(f.vaultId, userId)),
+  )
 
 export const libraryHandlers = [
   http.get(`${API}/files/favorites`, async ({ request }) => {
@@ -48,7 +52,7 @@ export const libraryHandlers = [
     for (const row of rows) {
       if (seen.has(row.fileId)) continue
       const file = db.files.find((f) => f.id === row.fileId && f.state === 'active')
-      if (!file || !roleOf(file.vaultId, auth.user.id)) continue
+      if (!file || !accessOf(file, auth.user.id)) continue
       const dto = toFileDto(file, auth.user.id)
       if (!dto) continue
       seen.add(row.fileId)
@@ -103,7 +107,7 @@ export const libraryHandlers = [
     for (const id of body.fileIds) {
       const file = db.files.find((f) => f.id === id && f.state !== 'uploading')
       let code: ErrorCode | null = 'NOT_FOUND'
-      if (file && roleOf(file.vaultId, auth.user.id))
+      if (file && accessOf(file, auth.user.id))
         code = await runBulk(body.action, file, auth.user.id)
       if (code) result.failed.push({ id, code })
       else result.done.push(id)

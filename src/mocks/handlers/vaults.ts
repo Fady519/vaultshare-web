@@ -4,6 +4,7 @@ import { db, save, type MockVault } from '../db'
 import { sendMail } from '../mail'
 import { roleOf, vaultStats } from '../fileHelpers'
 import { API, authenticate, newId, now, problem } from './utils'
+import { toMemberDto } from './members'
 
 function toVaultDto(v: MockVault, userId: string): VaultDto {
   return {
@@ -12,6 +13,7 @@ function toVaultDto(v: MockVault, userId: string): VaultDto {
     description: v.description,
     ownerId: v.ownerId,
     role: roleOf(v.id, userId) ?? 'viewer',
+    myStatus: db.members.find((m) => m.vaultId === v.id && m.userId === userId)?.status ?? 'active',
     ...vaultStats(v.id),
     memberCount: db.members.filter((m) => m.vaultId === v.id).length,
     createdAt: v.createdAt,
@@ -141,20 +143,7 @@ export const vaultHandlers = [
 
     const members: MemberDto[] = db.members
       .filter((m) => m.vaultId === params.vaultId)
-      .map((m) => {
-        const u = db.users.find((x) => x.id === m.userId)!
-        return {
-          userId: u.id,
-          email: u.email,
-          displayName: u.displayName,
-          role: m.role,
-          status: m.status,
-          joinedAt: m.joinedAt,
-          publicKey: u.publicKey,
-          keyVersion: u.keyVersion,
-          fingerprint: u.fingerprint,
-        }
-      })
+      .map(toMemberDto)
     return HttpResponse.json(members)
   }),
 ]
