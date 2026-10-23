@@ -12,6 +12,18 @@ export function Toaster() {
         <div key={t.id} className={cx(styles.toast, styles[t.tone])}>
           <span className={styles.bar} aria-hidden />
           <p>{t.message}</p>
+          {t.action && (
+            <button
+              type="button"
+              className={styles.action}
+              onClick={() => {
+                t.action!.onClick()
+                dismiss(t.id)
+              }}
+            >
+              {t.action.label}
+            </button>
+          )}
           <button type="button" onClick={() => dismiss(t.id)} aria-label="Dismiss">
             ×
           </button>

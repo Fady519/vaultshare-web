@@ -32,6 +32,12 @@
   line-height: 1;
 }
 
+.toast .action {
+  font: var(--type-body-sm);
+  font-weight: 600;
+  color: var(--accent);
+}
+
 .bar {
   align-self: stretch;
   width: 3px;
