@@ -1,6 +1,7 @@
 import { delay, http, HttpResponse } from 'msw'
 import type { CreateVaultRequest, MemberDto, VaultDto, VaultRole } from '@/api/types'
 import { db, save, type MockVault } from '../db'
+import { sendMail } from '../mail'
 import { roleOf, vaultStats } from '../fileHelpers'
 import { API, authenticate, newId, now, problem } from './utils'
 
@@ -60,10 +61,13 @@ export const vaultHandlers = [
       joinedAt: now(),
     })
 
-    // people who already have an account join right away, the rest become invitations (phase 5)
+    // people who already have an account join right away, the rest get an invitation email
+    const origin = new URL(request.url).origin
     for (const m of body.members ?? []) {
-      const invitee = db.users.find((u) => u.email.toLowerCase() === m.email.trim().toLowerCase())
-      if (invitee && invitee.id !== user.id) {
+      const email = m.email.trim().toLowerCase()
+      const invitee = db.users.find((u) => u.email.toLowerCase() === email)
+      if (invitee?.id === user.id) continue
+      if (invitee) {
         db.members.push({
           vaultId: vault.id,
           userId: invitee.id,
@@ -71,6 +75,25 @@ export const vaultHandlers = [
           status: 'active',
           joinedAt: now(),
         })
+      } else {
+        const token = crypto.randomUUID().replace(/-/g, '')
+        db.invitations.push({
+          id: newId(),
+          token,
+          email,
+          vaultId: vault.id,
+          role: m.role,
+          invitedBy: user.id,
+          status: 'pending',
+          createdAt: now(),
+          expiresAt: new Date(Date.now() + 7 * 24 * 3600_000).toISOString(),
+        })
+        sendMail(
+          email,
+          `${user.displayName} invited you to ${vault.name}`,
+          `You were invited to the vault "${vault.name}" as ${m.role}. Create an account to join.`,
+          { link: `${origin}/invite/${token}` },
+        )
       }
     }
 
