@@ -1,0 +1,67 @@
+.group {
+  margin-top: 16px;
+}
+
+.groupTitle {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 6px;
+  font: var(--type-label);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.rule {
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 58px;
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.text button {
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-body-sm);
+  font-weight: 500;
+}
+
+.text button:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.text span {
+  font: var(--type-data-sm);
+  color: var(--faint);
+}
+
+.vault {
+  width: 160px;
+  font: var(--type-body-sm);
+  color: var(--muted);
+}
+
+.when {
+  width: 70px;
+  text-align: right;
+  font: var(--type-data-sm);
+  color: var(--faint);
+}

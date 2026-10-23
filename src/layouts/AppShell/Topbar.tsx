@@ -7,6 +7,7 @@ import styles from './Topbar.module.css'
 
 export function Topbar() {
   const crumbs = useUi((s) => s.crumbs)
+  const setSearchQuery = useUi((s) => s.setSearchQuery)
   const navigate = useNavigate()
   const searchRef = useRef<HTMLInputElement>(null)
 
@@ -57,8 +58,10 @@ export function Topbar() {
           className={styles.search}
           onSubmit={(e) => {
             e.preventDefault()
-            const q = searchRef.current?.value.trim()
-            navigate(q ? `/search?q=${encodeURIComponent(q)}` : '/search')
+            const input = searchRef.current
+            setSearchQuery(input?.value.trim() ?? '')
+            if (input) input.value = ''
+            navigate('/search')
           }}
         >
           <SearchBar ref={searchRef} placeholder="Search encrypted metadata" label="Search files" />
