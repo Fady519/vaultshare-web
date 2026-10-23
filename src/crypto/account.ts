@@ -7,6 +7,9 @@ import {
   fingerprint,
   generateKeyPair,
   importPrivateKey,
+  importPublicKey,
+  rsaDecrypt,
+  rsaEncrypt,
 } from './rsa'
 import { open, seal } from './seal'
 import { openWithPhrase, sealWithPhrase } from './recovery'
@@ -131,4 +134,99 @@ export async function rewrapWithNewPassword(
 export async function checkRecoveryKit(recoveryWords: string[], sealedRecoveryKeyB64: string) {
   const pkcs8 = await openWithPhrase(recoveryWords, fromBase64(sealedRecoveryKeyB64))
   pkcs8.fill(0)
+}
+
+type Salts = { saltAuth: string; saltWrap: string }
+
+/*
+  Changing the password while signed in. The key in memory is non-extractable
+  on purpose, so the sealed copy is opened with the current password and sealed
+  again under the new one. Throws DecryptError when the current password is wrong.
+*/
+export async function changePasswordSecrets(
+  current: string,
+  salts: Salts,
+  sealedPrivateKeyB64: string,
+  next: string,
+) {
+  const old = await passwordSecrets(current, salts.saltAuth, salts.saltWrap)
+  const pkcs8 = await open(old.wrapKey, fromBase64(sealedPrivateKeyB64))
+  try {
+    const fresh = await newPasswordSecrets(next)
+    return {
+      currentVerifier: old.verifier,
+      saltAuth: fresh.saltAuth,
+      saltWrap: fresh.saltWrap,
+      verifier: fresh.verifier,
+      sealedPrivateKey: toBase64(await seal(fresh.wrapKey, pkcs8)),
+    }
+  } finally {
+    pkcs8.fill(0)
+  }
+}
+
+// twelve new words for the same key; the old kit stops working once the server keeps this one
+export async function newRecoveryKit(
+  password: string,
+  salts: Salts,
+  sealedPrivateKeyB64: string,
+  words: string[],
+) {
+  const { wrapKey } = await passwordSecrets(password, salts.saltAuth, salts.saltWrap)
+  const pkcs8 = await open(wrapKey, fromBase64(sealedPrivateKeyB64))
+  try {
+    return toBase64(await sealWithPhrase(words, pkcs8))
+  } finally {
+    pkcs8.fill(0)
+  }
+}
+
+/*
+  Key-pair rotation: a new RSA-4096 pair, sealed under the same password and a
+  new recovery kit, and every data key I hold re-wrapped from the old private
+  key to the new public key. File ciphertext isn't touched, so it's quick.
+*/
+export async function rotateKeyPair(
+  oldPrivateKey: CryptoKey,
+  password: string,
+  salts: Salts,
+  sealedPrivateKeyB64: string,
+  words: string[],
+  wrapped: { versionId: string; wrapped: string }[],
+  onProgress?: (done: number) => void,
+) {
+  const { wrapKey } = await passwordSecrets(password, salts.saltAuth, salts.saltWrap)
+  // proves the password before anything new is sealed under it
+  const check = await open(wrapKey, fromBase64(sealedPrivateKeyB64))
+  check.fill(0)
+
+  const next = await runKeyCeremony(wrapKey, words)
+  const publicKey = await importPublicKey(fromBase64(next.publicKey))
+  const rewrapped: { versionId: string; wrapped: string }[] = []
+  for (const [i, w] of wrapped.entries()) {
+    const raw = await rsaDecrypt(oldPrivateKey, fromBase64(w.wrapped))
+    try {
+      rewrapped.push({
+        versionId: w.versionId,
+        wrapped: toBase64(await rsaEncrypt(publicKey, raw)),
+      })
+    } finally {
+      raw.fill(0)
+    }
+    onProgress?.(i + 1)
+  }
+  return { ...next, rewrapped }
+}
+
+// a brand new pair, nothing carried over (danger zone: reset)
+export async function resetKeyPair(
+  password: string,
+  salts: Salts,
+  sealedPrivateKeyB64: string,
+  words: string[],
+) {
+  const { wrapKey } = await passwordSecrets(password, salts.saltAuth, salts.saltWrap)
+  const check = await open(wrapKey, fromBase64(sealedPrivateKeyB64))
+  check.fill(0)
+  return runKeyCeremony(wrapKey, words)
 }
