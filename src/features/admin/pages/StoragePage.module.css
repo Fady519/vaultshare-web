@@ -1,0 +1,76 @@
+.total {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 16px 0 24px;
+  padding: 22px 24px;
+  background: var(--surface);
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--radius-card);
+}
+
+.big {
+  font: var(--type-h1);
+  font-size: 1.75rem;
+}
+
+.big span {
+  font: var(--type-body);
+  color: var(--muted);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(200px, 1.3fr) 70px 80px 80px;
+  align-items: center;
+  gap: 16px;
+  min-height: 52px;
+  border-bottom: 1px solid var(--rule-soft);
+  font: var(--type-body-sm);
+}
+
+.head {
+  min-height: 40px;
+  font: var(--type-label);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--faint);
+  border-bottom-color: var(--rule);
+}
+
+.vault {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text);
+}
+
+.vault svg {
+  color: var(--faint);
+}
+
+.barCell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 80px;
+  align-items: center;
+  gap: 12px;
+}
+
+.track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--raised);
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+  border-radius: 3px;
+  background: var(--accent);
+}
+
+.mono {
+  font: var(--type-data-sm);
+  color: var(--muted);
+}

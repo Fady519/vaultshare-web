@@ -24,3 +24,14 @@ export async function toggleTamper(versionId: string): Promise<boolean> {
   const res = await fetch(`/__dev/tamper?versionId=${versionId}`, { method: 'POST' })
   return res.ok ? (await res.json()).tampered : false
 }
+
+// which audit entry the dev switch has edited (null = none)
+export async function auditTamperState(): Promise<number | null> {
+  const res = await fetch('/__dev/audit-tamper')
+  return res.ok ? (await res.json()).seq : null
+}
+
+export async function toggleAuditTamper(): Promise<number | null> {
+  const res = await fetch('/__dev/audit-tamper', { method: 'POST' })
+  return res.ok ? (await res.json()).seq : null
+}

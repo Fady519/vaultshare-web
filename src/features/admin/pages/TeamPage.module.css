@@ -1,0 +1,89 @@
+.cards {
+  margin-top: 16px;
+}
+
+.table {
+  margin-top: 20px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) 150px 80px 160px 120px 40px;
+  align-items: center;
+  gap: 14px;
+  min-height: 62px;
+  border-bottom: 1px solid var(--rule-soft);
+  font: var(--type-body-sm);
+}
+
+.head {
+  min-height: 42px;
+  font: var(--type-label);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--faint);
+  border-bottom-color: var(--rule);
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.person > span:last-child {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.name {
+  font-weight: 500;
+}
+
+.email {
+  font: var(--type-data-sm);
+  color: var(--faint);
+}
+
+.mono {
+  font: var(--type-data-sm);
+  color: var(--muted);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.ok {
+  color: var(--accent);
+}
+
+.warn {
+  color: var(--warn);
+}
+
+.danger {
+  color: var(--danger);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.note {
+  margin-top: 16px;
+  font: var(--type-data-sm);
+  color: var(--faint);
+}

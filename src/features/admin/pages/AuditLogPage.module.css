@@ -1,0 +1,115 @@
+.filters {
+  display: flex;
+  gap: 10px;
+  padding: 16px 0;
+}
+
+.table {
+  margin-top: 4px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 52px 120px minmax(150px, 1fr) minmax(150px, 1fr) minmax(160px, 1.2fr) 90px;
+  align-items: center;
+  gap: 14px;
+  min-height: 50px;
+  border-bottom: 1px solid var(--rule-soft);
+  font: var(--type-body-sm);
+}
+
+.head {
+  min-height: 40px;
+  font: var(--type-label);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--faint);
+  border-bottom-color: var(--rule);
+}
+
+.broken {
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+  box-shadow: inset 2px 0 0 var(--danger);
+}
+
+.mono {
+  font: var(--type-data-sm);
+  color: var(--faint);
+}
+
+.event {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.event code {
+  font: var(--type-data-sm);
+  color: var(--text);
+}
+
+.dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.fine {
+  background: var(--accent);
+}
+
+.change {
+  background: var(--warn);
+}
+
+.bad {
+  background: var(--danger);
+}
+
+.actor {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: var(--muted);
+}
+
+.system {
+  display: inline-flex;
+  justify-content: center;
+  width: 24px;
+  color: var(--faint);
+}
+
+.resource {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+.hash {
+  font: var(--type-data-sm);
+  color: var(--accent);
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 0;
+  font: var(--type-data-sm);
+  color: var(--faint);
+}
+
+.note {
+  font: var(--type-data-sm);
+  color: var(--faint);
+}
+
+.tamper {
+  margin-top: 16px;
+  max-width: 520px;
+}

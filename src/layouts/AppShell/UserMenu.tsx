@@ -51,7 +51,6 @@ export function UserMenu() {
 
   const user = me.data
   const isAdmin = user.systemRole === 'admin'
-  const isAuditor = user.systemRole === 'auditor'
 
   return (
     <div className={styles.wrap} ref={wrapRef}>
@@ -64,7 +63,7 @@ export function UserMenu() {
               </Link>
             </li>
           ))}
-          {(isAdmin || isAuditor) && (
+          {isAdmin && (
             <li role="none">
               <Link role="menuitem" to="/admin" onClick={() => setOpen(false)}>
                 Administration

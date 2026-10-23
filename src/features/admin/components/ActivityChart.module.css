@@ -1,0 +1,54 @@
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) 48px;
+  align-items: end;
+  gap: 14px;
+}
+
+.label {
+  font: var(--type-body-sm);
+  color: var(--muted);
+}
+
+.svg {
+  width: 100%;
+  height: 44px;
+}
+
+.base {
+  stroke: var(--rule);
+  stroke-width: 1;
+}
+
+.hit {
+  fill: transparent;
+}
+
+.bar {
+  fill: var(--accent);
+}
+
+g:hover .bar {
+  fill: var(--text);
+}
+
+.total {
+  font: var(--type-data);
+  color: var(--text);
+  text-align: right;
+}
+
+.axis {
+  display: flex;
+  justify-content: space-between;
+  margin-left: 134px;
+  margin-right: 62px;
+  font: var(--type-data-sm);
+  color: var(--faint);
+}
