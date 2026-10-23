@@ -87,8 +87,23 @@ stand-in for an S3 bucket.
 - **Invite flow for someone new:** open `/invite/demo-invite-2026` (for nora@northgate.io),
   create the account, then sign in as Maya or Jack: Product Legal shows "waiting for their
   keys" with a button that wraps them. After that Nora can open the files.
+- **Settings and admin:** Jack is the organisation's administrator (*Administration* in the
+  menu under his name). Sam is a regular member: the audit log shows him only his own
+  events, and the admin page isn't in his menu. Jack starts with four signed-in devices, so
+  *Sessions & devices* has something to revoke.
+- The bell counts unread notifications. File names in them are decrypted in the browser;
+  the server only writes `{file}` and the file id.
+- *Profile → Change password* seals the same private key again under the new password, in
+  the browser. Lock (menu → Lock now) and unlock with the new one to see it worked.
+- *Encryption keys → Rotate key pair* re-wraps every data key Jack holds (about 40) to a new
+  key pair and shows new twelve words. Files keep opening afterwards.
+- **Mock database** box on the audit log page edits one entry in the middle of the chain the
+  way someone with database access could. *Verify chain* then names the broken entry. Click
+  the box again to undo it.
+- *Administration → ⋯ → Suspend* ends that person's sessions at once, and signing in tells
+  them an administrator suspended the account.
 - When the mock data format changes the database is rebuilt on its own (it was in phases 3,
-  4 and 5), so files you uploaded earlier disappear. `/dev/ui` → "Reset mock data" does the same.
+  4, 5 and 6), so files you uploaded earlier disappear. `/dev/ui` → "Reset mock data" does the same.
 
 ### Useful pages while developing
 
@@ -149,5 +164,5 @@ src/
 | 3 | Vault & files I — upload/encrypt, download/decrypt, detail, versions, preview | done |
 | 4 | Vault & files II — rename/move, delete, bulk, favorites, recent, search, trash | done |
 | 5 | Sharing & permissions — share, step-up, secure links, members, invites | done |
-| 6 | Settings & admin — security, sessions, keys, notifications, team, storage, audit | |
+| 6 | Settings & admin — security, sessions, keys, notifications, team, storage, audit | done |
 | 7 | Mobile layouts, error/empty/loading states, accessibility pass, v1.0.0 | |
