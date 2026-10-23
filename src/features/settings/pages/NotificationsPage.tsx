@@ -47,7 +47,7 @@ export default function NotificationsPage() {
   const names = useFileNames(index.data)
   const [filter, setFilter] = useState<Filter>('all')
 
-  const items = list.data ?? []
+  const items = useMemo(() => list.data ?? [], [list.data])
   const shown = items.filter((n) => filter === 'all' || n.category === filter)
   const unread = items.filter((n) => !n.read).length
   const counts = useMemo(() => {
