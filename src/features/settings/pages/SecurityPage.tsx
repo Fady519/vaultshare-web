@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import QRCode from 'qrcode'
 import {
@@ -247,7 +247,11 @@ function AddAuthenticator({ email, onClose }: { email: string; onClose: () => vo
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
+  // once per dialog: a second setup (StrictMode runs effects twice) would replace the secret
+  const started = useRef(false)
   useEffect(() => {
+    if (started.current) return
+    started.current = true
     settingsApi
       .totpSetup()
       .then(async (res) =>
@@ -318,13 +322,16 @@ function AddAuthenticator({ email, onClose }: { email: string; onClose: () => vo
           error={Boolean(error)}
         />
         {error && <p className={styles.error}>{error}</p>}
-        <MockAuthenticator
-          email={email}
-          onUseCode={(c) => {
-            setCode(c)
-            confirm(c)
-          }}
-        />
+        {/* only once the new secret exists, or it would show the old factor's code */}
+        {setup && (
+          <MockAuthenticator
+            email={email}
+            onUseCode={(c) => {
+              setCode(c)
+              confirm(c)
+            }}
+          />
+        )}
       </div>
     </Modal>
   )

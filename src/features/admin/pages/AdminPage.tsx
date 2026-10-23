@@ -165,7 +165,13 @@ export default function AdminPage() {
                   {u.status === 'disabled' && <Tag tone="danger">Suspended</Tag>}
                 </span>
               </span>
-              <span role="cell">{u.systemRole === 'user' ? 'Member' : u.systemRole}</span>
+              <span role="cell">
+                {u.systemRole === 'user'
+                  ? 'Member'
+                  : u.systemRole === 'admin'
+                    ? 'Admin'
+                    : 'Auditor'}
+              </span>
               <span role="cell" className={styles.mono}>
                 {u.fingerprint ? `${u.fingerprint.slice(0, 9)}…` : 'no key yet'}
               </span>

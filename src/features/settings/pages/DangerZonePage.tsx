@@ -213,7 +213,10 @@ function RotateVaultDialog({
           targets.push({ fileId: f.id, versionId: v.id })
       }
       await rekeyVersions(targets, setProgress)
-      toast(`${targets.length} versions in ${vaultName} re-encrypted under new keys.`, 'ok')
+      toast(
+        `${targets.length} version${targets.length === 1 ? '' : 's'} in ${vaultName} re-encrypted under new keys.`,
+        'ok',
+      )
       qc.invalidateQueries()
       onClose()
     } catch (err) {
