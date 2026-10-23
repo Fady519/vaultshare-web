@@ -177,6 +177,5 @@ export async function seed(): Promise<Omit<MockDb, 'version'>> {
     challenges: [],
     stepUps: [],
     outbox: [],
-    audit: [],
   }
 }

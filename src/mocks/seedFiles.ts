@@ -1,4 +1,4 @@
-import { toBase64 } from '@/crypto/encoding'
+import { concatBytes, fromHex, toBase64, toHex, utf8 } from '@/crypto/encoding'
 import {
   chunkAad,
   encryptChunk,
@@ -9,8 +9,17 @@ import {
   versionDigest,
   wrapDataKey,
 } from '@/crypto/files'
-import type { MockChunk, MockDb, MockFile, MockFavorite, MockVersion, MockWrappedKey } from './db'
+import type {
+  MockAudit,
+  MockChunk,
+  MockDb,
+  MockFile,
+  MockFavorite,
+  MockVersion,
+  MockWrappedKey,
+} from './db'
 import { putBlob } from './blobStore'
+import { canonical } from './audit'
 import { makeCsv, makeLogoSvg, makeMarkdown, makePdf, makeText } from './sampleContent'
 
 /*
@@ -360,6 +369,7 @@ export async function seedFiles(
   const chunks: MockChunk[] = []
   const wrappedKeys: MockWrappedKey[] = []
   const favorites: MockFavorite[] = []
+  const events: Omit<MockAudit, 'seq' | 'prevHash' | 'hash'>[] = []
   const now = Date.now()
   const at = (h: number) => new Date(now - h * 3_600_000).toISOString()
 
@@ -414,6 +424,13 @@ export async function seedFiles(
           createdAt: at(v.hoursAgo),
           createdBy: userIds[v.by],
         })
+        events.push({
+          timestamp: at(v.hoursAgo),
+          actorId: userIds[v.by],
+          action: i === 0 ? 'file.upload' : 'file.version',
+          resourceType: 'file',
+          resourceId: fileId,
+        })
       }
 
       const first = ordered[0]
@@ -434,5 +451,23 @@ export async function seedFiles(
     }
   }
 
-  return { files, versions, chunks, wrappedKeys, favorites, access: [] }
+  return { files, versions, chunks, wrappedKeys, favorites, access: [], audit: await chain(events) }
+}
+
+// the uploads above as an audit trail, hash-chained the same way appendAudit does it
+async function chain(events: Omit<MockAudit, 'seq' | 'prevHash' | 'hash'>[]) {
+  const sorted = [...events].sort((a, b) => a.timestamp.localeCompare(b.timestamp))
+  const out: MockAudit[] = []
+  let prevHash = '0'.repeat(64)
+  for (const [i, e] of sorted.entries()) {
+    const entry = { ...e, seq: i + 1 }
+    const digest = await crypto.subtle.digest(
+      'SHA-256',
+      concatBytes(fromHex(prevHash), utf8(canonical(entry))),
+    )
+    const hash = toHex(new Uint8Array(digest))
+    out.push({ ...entry, prevHash, hash })
+    prevHash = hash
+  }
+  return out
 }
