@@ -11,15 +11,30 @@ export function FileTable({
   children,
   columns = DEFAULT_COLUMNS,
   selectable,
+  allSelected,
+  onSelectAll,
 }: {
   children: ReactNode
   columns?: string[]
   selectable?: boolean
+  allSelected?: boolean
+  onSelectAll?: (on: boolean) => void
 }) {
   return (
     <div role="table" className={cx(styles.table, selectable && styles.selectable)}>
       <div role="row" className={cx(styles.grid, styles.head)}>
-        {selectable && <span role="columnheader" aria-label="Select" />}
+        {selectable && (
+          <span role="columnheader" className={styles.check}>
+            {onSelectAll && (
+              <input
+                type="checkbox"
+                checked={Boolean(allSelected)}
+                aria-label={allSelected ? 'Clear the selection' : 'Select every file'}
+                onChange={(e) => onSelectAll(e.target.checked)}
+              />
+            )}
+          </span>
+        )}
         {columns.map((c) => (
           <span key={c} role="columnheader">
             {c}
@@ -80,7 +95,9 @@ export function FileRow({
             type="checkbox"
             checked={Boolean(selected)}
             aria-label={`Select ${name}`}
-            onChange={(e) => onSelect(e.target.checked, (e.nativeEvent as MouseEvent).shiftKey)}
+            // onClick, not onChange: only the click event reliably says whether shift was held
+            onClick={(e) => onSelect(e.currentTarget.checked, e.shiftKey)}
+            onChange={() => {}}
           />
         </span>
       )}
