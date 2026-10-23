@@ -38,7 +38,7 @@ Then open http://localhost:5173.
 | `npm run preview` | serve the production build |
 | `npm run lint` | ESLint |
 | `npm run format` | Prettier |
-| `npm test` | unit tests (crypto module, file chunking, version diff) |
+| `npm test` | unit tests (crypto module, file chunking, secure links, version diff) |
 
 ### Demo accounts (mock server)
 
@@ -76,8 +76,19 @@ stand-in for an S3 bucket.
   (Engineering) to open a file Jack moved there; Maya (Legal only) no longer finds it.
 - Search runs in the browser on decrypted names and notes; the words are kept in memory, not
   in the URL, and never sent to the API.
-- When the mock data format changes the database is rebuilt on its own (it was in phases 3
-  and 4), so files you uploaded earlier disappear. `/dev/ui` → "Reset mock data" does the same.
+- **Sharing:** Maya owns a "Partner deals" vault Jack isn't in, and shared two of its files
+  with him (see *Shared with me*). Jack shared three Engineering / Board files out (see
+  *Shared by me*). Sharing, changing roles, inviting, revoking and links ask for the second
+  factor again: the dialog has the same "Fill it in" box as sign-in.
+- **A secure link that works in any browser, even a private window:**
+  `http://localhost:5173/s/demoLink2026Nq4vXr8TkP2mW7sYb3Hd#k=nzwad-C0XSKIrDHwXUFAKrxLKna5cZ2RxIosyYQ2oQs`
+  (every browser seeds this one). Links you create yourself only open in the same browser
+  while the API is mocked, because the mock "server" lives in that browser's storage.
+- **Invite flow for someone new:** open `/invite/demo-invite-2026` (for nora@northgate.io),
+  create the account, then sign in as Maya or Jack: Product Legal shows "waiting for their
+  keys" with a button that wraps them. After that Nora can open the files.
+- When the mock data format changes the database is rebuilt on its own (it was in phases 3,
+  4 and 5), so files you uploaded earlier disappear. `/dev/ui` → "Reset mock data" does the same.
 
 ### Useful pages while developing
 
@@ -137,6 +148,6 @@ src/
 | 2 | Crypto module + onboarding & auth (13 screens) | done |
 | 3 | Vault & files I — upload/encrypt, download/decrypt, detail, versions, preview | done |
 | 4 | Vault & files II — rename/move, delete, bulk, favorites, recent, search, trash | done |
-| 5 | Sharing & permissions — share, step-up, secure links, members, invites | |
+| 5 | Sharing & permissions — share, step-up, secure links, members, invites | done |
 | 6 | Settings & admin — security, sessions, keys, notifications, team, storage, audit | |
 | 7 | Mobile layouts, error/empty/loading states, accessibility pass, v1.0.0 | |
