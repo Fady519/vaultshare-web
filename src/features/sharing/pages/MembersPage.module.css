@@ -1,0 +1,109 @@
+.mark {
+  margin-top: 22px;
+}
+
+.members {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.member {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: var(--surface);
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--radius-card);
+}
+
+.who {
+  flex: 1;
+  min-width: 0;
+}
+
+.who p {
+  font: var(--type-body-sm);
+  font-weight: 600;
+}
+
+.who span {
+  font: var(--type-data-sm);
+  color: var(--faint);
+}
+
+.who .pending {
+  color: var(--warn);
+}
+
+.role {
+  min-width: 150px;
+  text-align: right;
+  font: var(--type-label);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.mail {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px dashed var(--rule);
+  border-radius: 50%;
+  color: var(--faint);
+}
+
+.matrixHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 30px;
+  font: var(--type-data-sm);
+  color: var(--faint);
+}
+
+.matrix {
+  width: 100%;
+  margin-top: 12px;
+  border-collapse: collapse;
+}
+
+.matrix th,
+.matrix td {
+  padding: 11px 0;
+  border-bottom: 1px solid var(--rule-soft);
+  text-align: left;
+  font: var(--type-body-sm);
+}
+
+.matrix thead th {
+  font: var(--type-label);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--faint);
+  border-bottom-color: var(--rule);
+}
+
+.matrix tbody th {
+  font-weight: 400;
+}
+
+.matrix td {
+  width: 13%;
+  color: var(--accent);
+}
+
+.matrix td span {
+  color: var(--faint);
+}
+
+.note {
+  margin-top: 14px;
+  font: var(--type-data-sm);
+  color: var(--faint);
+}

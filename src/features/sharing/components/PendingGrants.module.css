@@ -1,0 +1,35 @@
+.box {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--warn);
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--warn) 8%, transparent);
+}
+
+.title {
+  margin-bottom: 8px;
+  font: var(--type-body-sm);
+  font-weight: 600;
+  color: var(--warn);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.who {
+  flex: 1;
+  min-width: 0;
+}
+
+.who p {
+  font: var(--type-body-sm);
+}
+
+.who span {
+  font: var(--type-data-sm);
+  color: var(--faint);
+}

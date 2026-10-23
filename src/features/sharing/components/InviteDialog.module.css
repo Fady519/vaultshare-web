@@ -1,0 +1,58 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-20);
+}
+
+.roles {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: -6px;
+}
+
+.role {
+  display: grid;
+  grid-template-columns: 18px 90px 1fr;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+}
+
+.role input {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border: 1.5px solid var(--faint);
+  border-radius: 50%;
+}
+
+.role input:checked {
+  border-color: var(--accent);
+  background: radial-gradient(var(--accent) 0 4px, transparent 4.5px);
+}
+
+.on {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.roleName {
+  font: var(--type-body-sm);
+  font-weight: 600;
+}
+
+.roleWhat {
+  font: var(--type-body-sm);
+  color: var(--muted);
+}
+
+.busy {
+  margin-right: auto;
+  font: var(--type-data-sm);
+  color: var(--accent);
+}
