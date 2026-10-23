@@ -1,11 +1,19 @@
 import type { FileDto, VaultRole, VersionDto, WrappedKeyDto } from '@/api/types'
 import { db, type MockFile, type MockVersion } from './db'
 
+// days a trashed file waits before it's purged (admin setting in phase 6)
+export const RETENTION_DAYS = 30
+
 export const roleOf = (vaultId: string, userId: string) =>
   db.members.find((m) => m.vaultId === vaultId && m.userId === userId)?.role
 
 export const canWrite = (role?: VaultRole) =>
   role === 'owner' || role === 'manager' || role === 'editor'
+
+export const canManage = (role?: VaultRole) => role === 'owner' || role === 'manager'
+
+export const purgeAtOf = (deletedAt: string) =>
+  new Date(new Date(deletedAt).getTime() + RETENTION_DAYS * 86_400_000).toISOString()
 
 export const userName = (id: string) => db.users.find((u) => u.id === id)?.displayName ?? 'Unknown'
 
@@ -63,7 +71,8 @@ export function toFileDto(f: MockFile, userId: string): FileDto | null {
     state: f.state === 'trashed' ? 'trashed' : 'active',
     isFavorite: db.favorites.some((x) => x.userId === userId && x.fileId === f.id),
     deletedAt: f.deletedAt,
-    purgeAt: null,
+    deletedBy: f.deletedBy ? { id: f.deletedBy, displayName: userName(f.deletedBy) } : null,
+    purgeAt: f.deletedAt ? purgeAtOf(f.deletedAt) : null,
     updatedAt: f.updatedAt,
     updatedBy: { id: v.createdBy, displayName: userName(v.createdBy) },
     currentVersion: toVersionDto(v, userId),

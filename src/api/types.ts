@@ -297,6 +297,8 @@ export type FileDto = {
   state: 'active' | 'trashed'
   isFavorite: boolean
   deletedAt: IsoDate | null
+  deletedBy: Person | null
+  // deletedAt + the retention period; the server purges it then
   purgeAt: IsoDate | null
   updatedAt: IsoDate
   updatedBy: Person

@@ -130,6 +130,7 @@ export type MockFile = {
   ownerId: string
   state: 'uploading' | 'active' | 'trashed'
   deletedAt: string | null
+  deletedBy: string | null
   createdAt: string
   updatedAt: string
 }
@@ -199,7 +200,7 @@ export type MockDb = {
 }
 
 // bump when the shape changes, old local data gets reseeded
-const DB_VERSION = 3
+const DB_VERSION = 4
 const STORAGE_KEY = 'vaultshare.mock-db'
 
 export let db = {} as MockDb

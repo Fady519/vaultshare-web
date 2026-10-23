@@ -3,6 +3,7 @@ import type { AuditEntryDto, CommitRequest, FileDetailDto, UploadInitRequest } f
 import { db, save } from '../db'
 import { appendAudit } from '../audit'
 import { deleteBlob, getBlob, putBlob } from '../blobStore'
+import { purgeExpired } from '../fileOps'
 import {
   canWrite,
   committedVersions,
@@ -32,6 +33,7 @@ export const fileHandlers = [
     const vaultId = String(params.vaultId)
     if (!roleOf(vaultId, auth.user.id)) return problem(404, 'NOT_FOUND', 'Vault not found.')
 
+    if (await purgeExpired()) save()
     const state =
       new URL(request.url).searchParams.get('state') === 'trashed' ? 'trashed' : 'active'
     const items = db.files
@@ -75,6 +77,7 @@ export const fileHandlers = [
         ownerId: auth.user.id,
         state: 'uploading',
         deletedAt: null,
+        deletedBy: null,
         createdAt: now(),
         updatedAt: now(),
       })

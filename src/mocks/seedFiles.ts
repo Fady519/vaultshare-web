@@ -14,6 +14,7 @@ import type {
   MockChunk,
   MockDb,
   MockFile,
+  MockAccess,
   MockFavorite,
   MockVersion,
   MockWrappedKey,
@@ -29,7 +30,16 @@ import { makeCsv, makeLogoSvg, makeMarkdown, makePdf, makeText } from './sampleC
 
 type Who = 'jack' | 'maya' | 'ilan'
 type SeedVersion = { by: Who; hoursAgo: number; note?: string; content: Uint8Array }
-type SeedFile = { name: string; mime: string; versions: SeedVersion[]; favorite?: boolean }
+type SeedFile = {
+  name: string
+  mime: string
+  versions: SeedVersion[]
+  favorite?: boolean
+  // opened (downloaded and decrypted) by someone, for the Recent page
+  opened?: { by: Who; hoursAgo: number }[]
+  // in the trash since then; purged RETENTION_DAYS later
+  trashed?: { by: Who; hoursAgo: number }
+}
 
 const PDF = 'application/pdf'
 const MD = 'text/markdown'
@@ -56,6 +66,7 @@ function plan(): Record<string, SeedFile[]> {
         name: 'contract-northgate-2026.pdf',
         mime: PDF,
         favorite: true,
+        opened: [{ by: 'jack', hoursAgo: 3 }],
         versions: [
           {
             by: 'jack',
@@ -92,6 +103,7 @@ function plan(): Record<string, SeedFile[]> {
       {
         name: 'dpa-appendix-signed.pdf',
         mime: PDF,
+        favorite: true,
         versions: [
           {
             by: 'jack',
@@ -128,6 +140,8 @@ function plan(): Record<string, SeedFile[]> {
       {
         name: 'security-review-q1.md',
         mime: MD,
+        favorite: true,
+        opened: [{ by: 'jack', hoursAgo: 26 }],
         versions: [1, 2, 3].map((rev, i) => ({
           by: 'ilan' as Who,
           hoursAgo: 200 - i * 80 + (i === 2 ? 15 : 0),
@@ -143,6 +157,7 @@ function plan(): Record<string, SeedFile[]> {
       {
         name: 'pentest-findings.csv',
         mime: CSV,
+        favorite: true,
         versions: [
           {
             by: 'jack',
@@ -230,6 +245,7 @@ function plan(): Record<string, SeedFile[]> {
       {
         name: 'architecture-notes.md',
         mime: MD,
+        opened: [{ by: 'jack', hoursAgo: 52 }],
         versions: [1, 2].map((rev, i) => ({
           by: 'maya' as Who,
           hoursAgo: 390 - i * 10,
@@ -265,11 +281,62 @@ function plan(): Record<string, SeedFile[]> {
           ]),
         })),
       },
+      {
+        name: 'old-msa-2024.pdf',
+        mime: PDF,
+        trashed: { by: 'jack', hoursAgo: 2 },
+        versions: [
+          {
+            by: 'jack',
+            hoursAgo: 2900,
+            content: makePdf('Master services agreement', '2024 edition (superseded)', [
+              { heading: 'Status', body: 'Replaced by the 2026 agreement.' },
+            ]),
+          },
+        ],
+      },
+      {
+        name: 'draft-notes-v1.md',
+        mime: MD,
+        trashed: { by: 'maya', hoursAgo: 26 },
+        versions: [
+          {
+            by: 'maya',
+            hoursAgo: 400,
+            content: makeMarkdown('Draft notes', 1, ['Old structure, see contract v4']),
+          },
+        ],
+      },
+      {
+        name: 'nda-template-2024.txt',
+        mime: TXT,
+        trashed: { by: 'jack', hoursAgo: 27 * 24 },
+        versions: [
+          {
+            by: 'jack',
+            hoursAgo: 3000,
+            content: makeText('NDA template 2024', 1, ['Mutual NDA, two years']),
+          },
+        ],
+      },
+      {
+        name: 'invoice-scan-april.pdf',
+        mime: PDF,
+        trashed: { by: 'jack', hoursAgo: 29 * 24 + 2 },
+        versions: [
+          {
+            by: 'jack',
+            hoursAgo: 3100,
+            content: makePdf('Invoice', 'April 2026', [{ heading: 'Total', body: 'EUR 12,400' }]),
+          },
+        ],
+      },
     ],
     eng: [
       {
         name: 'api-threat-model.md',
         mime: MD,
+        favorite: true,
         versions: [1, 2].map((rev, i) => ({
           by: (i ? 'ilan' : 'jack') as Who,
           hoursAgo: 150 - i * 100,
@@ -307,6 +374,24 @@ function plan(): Record<string, SeedFile[]> {
               '[x] CSP headers',
               '[ ] audit anchor signed',
             ]),
+          },
+        ],
+      },
+      {
+        name: 'supplier-list-old.csv',
+        mime: CSV,
+        trashed: { by: 'ilan', hoursAgo: 7 * 24 },
+        versions: [
+          {
+            by: 'ilan',
+            hoursAgo: 900,
+            content: makeCsv(
+              ['supplier', 'country', 'status'],
+              [
+                ['Acme Storage', 'NL', 'ended'],
+                ['Ridgeway IT', 'DE', 'ended'],
+              ],
+            ),
           },
         ],
       },
@@ -369,6 +454,7 @@ export async function seedFiles(
   const chunks: MockChunk[] = []
   const wrappedKeys: MockWrappedKey[] = []
   const favorites: MockFavorite[] = []
+  const access: MockAccess[] = []
   const events: Omit<MockAudit, 'seq' | 'prevHash' | 'hash'>[] = []
   const now = Date.now()
   const at = (h: number) => new Date(now - h * 3_600_000).toISOString()
@@ -431,6 +517,7 @@ export async function seedFiles(
           resourceType: 'file',
           resourceId: fileId,
         })
+        access.push({ userId: userIds[v.by], fileId, action: 'upload', at: at(v.hoursAgo) })
       }
 
       const first = ordered[0]
@@ -442,16 +529,36 @@ export async function seedFiles(
         nameIv: last.iv,
         mimeType: seed.mime,
         ownerId: userIds[first.by],
-        state: 'active',
-        deletedAt: null,
+        state: seed.trashed ? 'trashed' : 'active',
+        deletedAt: seed.trashed ? at(seed.trashed.hoursAgo) : null,
+        deletedBy: seed.trashed ? userIds[seed.trashed.by] : null,
         createdAt: at(first.hoursAgo),
         updatedAt: at(latest.hoursAgo),
       })
       if (seed.favorite) favorites.push({ userId: userIds.jack, fileId })
+      for (const o of seed.opened ?? []) {
+        access.push({ userId: userIds[o.by], fileId, action: 'download', at: at(o.hoursAgo) })
+        events.push({
+          timestamp: at(o.hoursAgo),
+          actorId: userIds[o.by],
+          action: 'file.download',
+          resourceType: 'file',
+          resourceId: fileId,
+        })
+      }
+      if (seed.trashed) {
+        events.push({
+          timestamp: at(seed.trashed.hoursAgo),
+          actorId: userIds[seed.trashed.by],
+          action: 'file.trash',
+          resourceType: 'file',
+          resourceId: fileId,
+        })
+      }
     }
   }
 
-  return { files, versions, chunks, wrappedKeys, favorites, access: [], audit: await chain(events) }
+  return { files, versions, chunks, wrappedKeys, favorites, access, audit: await chain(events) }
 }
 
 // the uploads above as an audit trail, hash-chained the same way appendAudit does it
