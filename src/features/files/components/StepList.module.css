@@ -1,0 +1,46 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) minmax(0, 0.8fr);
+  align-items: center;
+  font: var(--type-body-sm);
+  color: var(--faint);
+}
+
+.mark {
+  display: inline-flex;
+  align-items: center;
+}
+
+.box {
+  width: 9px;
+  height: 9px;
+  border: 1.4px solid currentColor;
+  border-radius: 2px;
+}
+
+.detail {
+  font: var(--type-data-sm);
+  color: var(--faint);
+}
+
+.active {
+  color: var(--text);
+}
+
+.active .mark {
+  color: var(--accent);
+}
+
+.done {
+  color: var(--accent);
+}
+
+.failed {
+  color: var(--danger);
+}

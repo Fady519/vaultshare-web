@@ -1,0 +1,101 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-20);
+}
+
+.queue {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.file {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--raised);
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--radius-control);
+}
+
+.active {
+  border-color: var(--accent-line);
+}
+
+.fileText {
+  flex: 1;
+  min-width: 0;
+}
+
+.fileName {
+  font: var(--type-body-sm);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fileMeta {
+  font: var(--type-data-sm);
+  color: var(--faint);
+}
+
+.err {
+  color: var(--danger);
+}
+
+.remove {
+  width: 24px;
+  height: 24px;
+  color: var(--faint);
+  font-size: 1.1rem;
+}
+
+.remove:hover {
+  color: var(--danger);
+}
+
+.crypto {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.stageRow {
+  display: flex;
+  justify-content: space-between;
+  font: var(--type-body-sm);
+}
+
+.pct {
+  font: var(--type-data);
+  color: var(--accent);
+}
+
+.recipients {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.recipients li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font: var(--type-micro);
+  color: var(--muted);
+}
+
+.recipients code {
+  font: var(--type-data-sm);
+  color: var(--faint);
+}
+
+.note {
+  font: var(--type-micro);
+  color: var(--faint);
+}
