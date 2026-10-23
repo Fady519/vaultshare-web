@@ -4,7 +4,7 @@ export function describeAgent(ua: string) {
     match(ua, /Edg\/(\d+)/, 'Edge') ??
     match(ua, /Firefox\/(\d+)/, 'Firefox') ??
     match(ua, /Chrome\/(\d+)/, 'Chrome') ??
-    match(ua, /Version\/(\d+)[^ ]* Safari/, 'Safari') ??
+    match(ua, /Version\/(\d+).*Safari/, 'Safari') ??
     'Unknown browser'
   const os = /iPhone/.test(ua)
     ? 'iPhone'

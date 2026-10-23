@@ -33,7 +33,7 @@ async function fingerprintOf(publicKeyB64: string) {
 // a stable fake address per session, the mock has no real network to read
 function fakeIp(familyId: string) {
   const n = [...familyId].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7)
-  return `${41 + (n % 150)}.${(n >> 8) % 255}.${(n >> 16) % 255}.x`
+  return `${41 + (n % 150)}.${(n >>> 8) % 255}.${(n >>> 16) % 255}.x`
 }
 
 function sessionsOf(userId: string, current: string | null): SessionDto[] {

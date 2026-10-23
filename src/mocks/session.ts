@@ -18,6 +18,11 @@ function refreshCookie(token: string, remember: boolean) {
   return `vs_refresh=${token}; Path=/; SameSite=Strict${maxAge}`
 }
 
+// a server reads the header; inside the mock worker it's hidden, so use the page's own
+const agentOf = (request: Request) =>
+  request.headers.get('User-Agent') ??
+  (typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown')
+
 export const clearRefreshCookie = 'vs_refresh=; Path=/; Max-Age=0'
 
 export function issueAccessToken(userId: string, familyId: string | null = null) {
@@ -49,7 +54,7 @@ export function sessionResponse(
 ) {
   const refresh = randomToken(32)
   const familyId = opts.familyId ?? crypto.randomUUID()
-  const userAgent = request.headers.get('User-Agent') ?? 'unknown'
+  const userAgent = agentOf(request)
   // a browser this account hasn't used before
   const newDevice = !db.refreshTokens.some((r) => r.userId === user.id && r.userAgent === userAgent)
   db.refreshTokens.push({
@@ -98,7 +103,7 @@ export function rotateRefresh(oldToken: string, request: Request) {
     token,
     usedAt: null,
     createdAt: now(),
-    userAgent: request.headers.get('User-Agent') ?? row.userAgent,
+    userAgent: agentOf(request),
   })
   const accessToken = issueAccessToken(row.userId, row.familyId)
   const user = db.users.find((u) => u.id === row.userId)
