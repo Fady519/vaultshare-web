@@ -1,4 +1,4 @@
-import { useState, type DragEvent } from 'react'
+import { useEffect, useState, type DragEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   Button,
@@ -14,6 +14,7 @@ import { useVault } from '@/api/vaults'
 import { useVaultFiles } from '@/api/files'
 import type { FileDto } from '@/api/types'
 import { useCrumbs } from '@/hooks/useCrumbs'
+import { useSelection } from '@/hooks/useSelection'
 import { formatDate, shortName, timeAgo } from '@/utils/format'
 import { cx } from '@/utils/cx'
 import { useFileNames } from '@/features/files/keys'
@@ -21,6 +22,10 @@ import { canPreview, cipherMeta } from '@/features/files/plaintext'
 import { UploadPanel } from '@/features/files/components/UploadPanel'
 import { DownloadPanel } from '@/features/files/components/DownloadPanel'
 import { DropZone } from '@/features/files/components/DropZone'
+import { RenameMoveDialog } from '@/features/files/components/RenameMoveDialog'
+import { BulkDownloadPanel } from '@/features/files/components/BulkDownloadPanel'
+import { toggleFavorite, trashWithUndo } from '@/features/files/actions'
+import { BulkBar } from '../components/BulkBar'
 import styles from './VaultPage.module.css'
 
 export default function VaultPage() {
@@ -35,6 +40,19 @@ export default function VaultPage() {
   const [newVersionOf, setNewVersionOf] = useState<{ fileId: string; name: string } | null>(null)
   const [downloading, setDownloading] = useState<FileDto | null>(null)
   const [dragging, setDragging] = useState(false)
+  const [moving, setMoving] = useState<{ file: FileDto; name: string }[] | null>(null)
+  const [bulkDownload, setBulkDownload] = useState<{ file: FileDto; name: string }[] | null>(null)
+  const items = files.data?.items ?? []
+  const selection = useSelection(items.map((f) => f.id))
+
+  // Esc clears the ticks, like a file manager
+  useEffect(() => {
+    if (selection.selected.size === 0) return
+    const onKey = (e: KeyboardEvent) =>
+      e.key === 'Escape' && !document.querySelector('dialog[open]') && selection.clear()
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [selection])
 
   useCrumbs({ label: 'Vaults', to: '/vaults' }, vault.data?.name ?? '…')
 
@@ -48,8 +66,9 @@ export default function VaultPage() {
 
   const v = vault.data
   const canWrite = v ? v.role !== 'viewer' : false
-  const items = files.data?.items ?? []
   const nameOf = (f: FileDto) => names.data?.[f.id] ?? '…'
+  const picked = items.filter((f) => selection.selected.has(f.id))
+  const withNames = (list: FileDto[]) => list.map((file) => ({ file, name: nameOf(file) }))
 
   function openUpload(list: File[] = []) {
     setNewVersionOf(null)
@@ -83,7 +102,8 @@ export default function VaultPage() {
           <h1 className={styles.title}>{v ? v.name : <Skeleton width={240} height={28} />}</h1>
           <p className={styles.meta}>
             {v
-              ? `${v.fileCount} files  ·  AES-256-GCM  ·  ${v.memberCount} members  ·  created ${formatDate(v.createdAt)}`
+              ? `${v.fileCount} files  ·  AES-256-GCM  ·  ${v.memberCount} members  ·  created ${formatDate(v.createdAt)}` +
+                (picked.length ? `  ·  ${picked.length} selected` : '')
               : ' '}
           </p>
         </div>
@@ -136,9 +156,33 @@ export default function VaultPage() {
         </div>
       )}
 
+      {picked.length > 0 && (
+        <BulkBar
+          count={picked.length}
+          total={items.length}
+          bytes={picked.reduce((n, f) => n + f.sizeBytes, 0)}
+          keyCopies={picked.reduce((n, f) => n + f.people.length, 0)}
+          canWrite={canWrite}
+          onToggleAll={selection.setAll}
+          onMove={() => setMoving(withNames(picked))}
+          onDownload={() => setBulkDownload(withNames(picked))}
+          onDelete={() => {
+            trashWithUndo(
+              picked.map((f) => f.id),
+              picked.length === 1 ? nameOf(picked[0]) : `${picked.length} files`,
+            )
+            selection.clear()
+          }}
+        />
+      )}
+
       {items.length > 0 && (
         <>
-          <FileTable>
+          <FileTable
+            selectable
+            allSelected={picked.length === items.length}
+            onSelectAll={selection.setAll}
+          >
             {items.map((f) => {
               const name = nameOf(f)
               return (
@@ -152,6 +196,8 @@ export default function VaultPage() {
                   when={timeAgo(f.updatedAt)}
                   who={shortName(f.updatedBy.displayName)}
                   favorite={f.isFavorite}
+                  selected={selection.selected.has(f.id)}
+                  onSelect={(on, shift) => selection.toggle(f.id, on, shift)}
                   onOpen={() => navigate(`/files/${f.id}`)}
                   actions={
                     <Menu
@@ -173,6 +219,21 @@ export default function VaultPage() {
                             setNewVersionOf({ fileId: f.id, name })
                             setUploadOpen(true)
                           },
+                        },
+                        {
+                          label: 'Rename or move',
+                          disabled: !canWrite,
+                          onSelect: () => setMoving([{ file: f, name }]),
+                        },
+                        {
+                          label: f.isFavorite ? 'Remove from favorites' : 'Add to favorites',
+                          onSelect: () => toggleFavorite(f),
+                        },
+                        {
+                          label: 'Move to trash',
+                          danger: true,
+                          disabled: !canWrite,
+                          onSelect: () => trashWithUndo([f.id], name),
                         },
                       ]}
                     />
@@ -205,6 +266,12 @@ export default function VaultPage() {
           initialFiles={dropped}
           existing={newVersionOf ?? undefined}
         />
+      )}
+
+      {moving && <RenameMoveDialog files={moving} onClose={() => setMoving(null)} />}
+
+      {bulkDownload && (
+        <BulkDownloadPanel files={bulkDownload} onClose={() => setBulkDownload(null)} />
       )}
 
       {downloading && (

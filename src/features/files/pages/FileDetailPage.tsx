@@ -1,16 +1,19 @@
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   Avatar,
   Button,
   Callout,
   DataCell,
   EmptyState,
+  Menu,
+  PageHead,
   SectionMark,
   Skeleton,
   Tag,
 } from '@/components'
 import { useFileDetail } from '@/api/files'
+import { useVault } from '@/api/vaults'
 import type { AuditAction, FileAccessEntry } from '@/api/types'
 import { fromBase64, IntegrityError, toHex } from '@/crypto'
 import { useCrumbs } from '@/hooks/useCrumbs'
@@ -20,9 +23,10 @@ import { errorMessage } from '@/api/client'
 import { useFileName } from '../keys'
 import { canPreview, digestHex, usePlaintext } from '../plaintext'
 import { DownloadPanel } from '../components/DownloadPanel'
-import { FileHead } from '../components/FileHead'
 import { FilePreview } from '../components/FilePreview'
 import { MockTamper } from '../components/MockTamper'
+import { RenameMoveDialog } from '../components/RenameMoveDialog'
+import { toggleFavorite, trashWithUndo } from '../actions'
 import styles from './FileDetailPage.module.css'
 
 // bigger files are only decrypted for a preview when asked to
@@ -48,6 +52,10 @@ export default function FileDetailPage() {
   const name = useFileName(file)
   const [asked, setAsked] = useState(false)
   const [downloading, setDownloading] = useState(false)
+  const [moving, setMoving] = useState(false)
+  const navigate = useNavigate()
+  const vault = useVault(detail.data?.file.vaultId)
+  const canWrite = vault.data ? vault.data.role !== 'viewer' : false
 
   const previewable = file ? canPreview(file.mimeType) : false
   const auto = file ? file.sizeBytes <= AUTO_PREVIEW_BYTES : false
@@ -76,8 +84,8 @@ export default function FileDetailPage() {
 
   return (
     <>
-      <FileHead
-        name={name}
+      <PageHead
+        title={name}
         meta={
           v
             ? `decrypted in this tab  ·  ${formatBytes(v.sizeBytes)}  ·  v${v.versionNo}  ·  sha256 ${shortHash(digestHex(v.digest))}`
@@ -94,6 +102,27 @@ export default function FileDetailPage() {
             <Button icon="down" disabled={!file || !name} onClick={() => setDownloading(true)}>
               Download
             </Button>
+            {file && name && (
+              <Menu
+                label={`More for ${name}`}
+                items={[
+                  {
+                    label: file.isFavorite ? 'Remove from favorites' : 'Add to favorites',
+                    onSelect: () => toggleFavorite(file),
+                  },
+                  { label: 'Rename or move', disabled: !canWrite, onSelect: () => setMoving(true) },
+                  {
+                    label: 'Move to trash',
+                    danger: true,
+                    disabled: !canWrite,
+                    onSelect: () => {
+                      trashWithUndo([file.id], name)
+                      navigate(`/vaults/${file.vaultId}`)
+                    },
+                  },
+                ]}
+              />
+            )}
           </>
         }
       />
@@ -209,6 +238,9 @@ export default function FileDetailPage() {
 
       {file && name && downloading && (
         <DownloadPanel open onClose={() => setDownloading(false)} file={file} name={name} />
+      )}
+      {file && name && moving && (
+        <RenameMoveDialog files={[{ file, name }]} onClose={() => setMoving(false)} />
       )}
     </>
   )
