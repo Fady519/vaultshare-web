@@ -57,3 +57,8 @@
   color: var(--faint);
   white-space: nowrap;
 }
+
+/* the bar's border shows focus, see TextField */
+.input:focus-visible {
+  outline: none;
+}
