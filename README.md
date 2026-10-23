@@ -70,8 +70,14 @@ stand-in for an S3 bucket.
   so you can watch the integrity check reject it. Click it again to put the byte back.
 - Reloading the page locks the vault on purpose (the private key only lives in memory).
   Sign in again, or navigate with the sidebar instead of the address bar.
-- When the mock data format changes the database is rebuilt on its own (it was in phase 3),
-  so files you uploaded earlier disappear. `/dev/ui` → "Reset mock data" does the same.
+- The trash starts with 5 files at different ages, so the purge countdown shows all three
+  colours; files past 30 days are purged automatically the next time a list loads.
+- Moving a file to another vault re-wraps its keys for that vault's members. Sign in as Ilan
+  (Engineering) to open a file Jack moved there; Maya (Legal only) no longer finds it.
+- Search runs in the browser on decrypted names and notes; the words are kept in memory, not
+  in the URL, and never sent to the API.
+- When the mock data format changes the database is rebuilt on its own (it was in phases 3
+  and 4), so files you uploaded earlier disappear. `/dev/ui` → "Reset mock data" does the same.
 
 ### Useful pages while developing
 
@@ -130,7 +136,7 @@ src/
 | 1 | Project setup, design tokens, components, layouts, routes, API client, mock server | done |
 | 2 | Crypto module + onboarding & auth (13 screens) | done |
 | 3 | Vault & files I — upload/encrypt, download/decrypt, detail, versions, preview | done |
-| 4 | Vault & files II — rename/move, delete, bulk, favorites, recent, search, trash | |
+| 4 | Vault & files II — rename/move, delete, bulk, favorites, recent, search, trash | done |
 | 5 | Sharing & permissions — share, step-up, secure links, members, invites | |
 | 6 | Settings & admin — security, sessions, keys, notifications, team, storage, audit | |
 | 7 | Mobile layouts, error/empty/loading states, accessibility pass, v1.0.0 | |
