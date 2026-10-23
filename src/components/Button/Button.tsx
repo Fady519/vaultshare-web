@@ -54,9 +54,10 @@ export const Button = forwardRef<HTMLButtonElement, Props>(function Button(
     </>
   )
 
-  if (to) {
+  // a disabled link isn't a thing, it falls through to a disabled <button>
+  if (to && !disabled) {
     return (
-      <Link to={to} className={classes}>
+      <Link to={to} className={classes} aria-label={rest['aria-label']} title={rest.title}>
         {content}
       </Link>
     )
