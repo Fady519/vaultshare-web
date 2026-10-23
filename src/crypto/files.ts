@@ -33,7 +33,7 @@ export const chunkAad = (fileId: string, versionId: string, index: number) =>
 export const nameAad = (fileId: string) => utf8(`${fileId}|name`)
 export const noteAad = (versionId: string) => utf8(`${versionId}|note`)
 
-function importAesKey(raw: Uint8Array) {
+export function importAesKey(raw: Uint8Array) {
   return crypto.subtle.importKey('raw', buf(raw), 'AES-GCM', false, ['encrypt', 'decrypt'])
 }
 
@@ -62,19 +62,30 @@ export async function unwrapDataKey(privateKey: CryptoKey, wrappedB64: string) {
   Moving a file to another vault: the same data key, wrapped again for the new
   member set. The raw key exists only inside this function and is zeroed after.
 */
-export async function rewrapDataKey(
+export function rewrapDataKey(
   privateKey: CryptoKey,
   wrappedB64: string,
   recipients: { userId: string; publicKey: string }[],
 ) {
-  const raw = await rsaDecrypt(privateKey, fromBase64(wrappedB64))
-  try {
-    return await Promise.all(
+  return withRawDataKey(privateKey, wrappedB64, (raw) =>
+    Promise.all(
       recipients.map(async (r) => ({
         userId: r.userId,
         wrapped: await wrapDataKey(raw, r.publicKey),
       })),
-    )
+    ),
+  )
+}
+
+// the raw key for the length of `fn` only (re-wrapping for a share or a link), zeroed after
+export async function withRawDataKey<T>(
+  privateKey: CryptoKey,
+  wrappedB64: string,
+  fn: (raw: Uint8Array) => Promise<T>,
+) {
+  const raw = await rsaDecrypt(privateKey, fromBase64(wrappedB64))
+  try {
+    return await fn(raw)
   } finally {
     raw.fill(0)
   }
