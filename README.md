@@ -38,7 +38,7 @@ Then open http://localhost:5173.
 | `npm run preview` | serve the production build |
 | `npm run lint` | ESLint |
 | `npm run format` | Prettier |
-| `npm test` | unit tests (the crypto module) |
+| `npm test` | unit tests (crypto module, file chunking, version diff) |
 
 ### Demo accounts (mock server)
 
@@ -60,6 +60,18 @@ click through. They only exist when `VITE_USE_MOCKS=true`:
 Jack also has the ten recovery codes from Figma screen 07 (`4KQ2-9WFH`, `8ZJ5-3MTA`, …).
 Recovery words for each demo user are in [`src/mocks/seed-keys.json`](src/mocks/seed-keys.json).
 A pending invite for a new user is at `/invite/demo-invite-2026`.
+
+The demo vaults hold 18 files that were encrypted for real when the mock database was
+created (Product Legal has 12; `contract-northgate-2026.pdf` has 4 versions with notes).
+Uploaded files are stored as ciphertext in IndexedDB (`vaultshare-mock-blobs`), the mock's
+stand-in for an S3 bucket.
+
+- **Mock object storage** box on a file's detail page: flips one byte of chunk 1 in storage
+  so you can watch the integrity check reject it. Click it again to put the byte back.
+- Reloading the page locks the vault on purpose (the private key only lives in memory).
+  Sign in again, or navigate with the sidebar instead of the address bar.
+- When the mock data format changes the database is rebuilt on its own (it was in phase 3),
+  so files you uploaded earlier disappear. `/dev/ui` → "Reset mock data" does the same.
 
 ### Useful pages while developing
 
@@ -117,7 +129,7 @@ src/
 |---|---|---|
 | 1 | Project setup, design tokens, components, layouts, routes, API client, mock server | done |
 | 2 | Crypto module + onboarding & auth (13 screens) | done |
-| 3 | Vault & files I — upload/encrypt, download/decrypt, detail, versions, preview | |
+| 3 | Vault & files I — upload/encrypt, download/decrypt, detail, versions, preview | done |
 | 4 | Vault & files II — rename/move, delete, bulk, favorites, recent, search, trash | |
 | 5 | Sharing & permissions — share, step-up, secure links, members, invites | |
 | 6 | Settings & admin — security, sessions, keys, notifications, team, storage, audit | |
