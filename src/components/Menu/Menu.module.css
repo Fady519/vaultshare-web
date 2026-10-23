@@ -1,0 +1,67 @@
+.wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.dots {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-control);
+  color: var(--faint);
+}
+
+.dots:hover,
+.dots[aria-expanded='true'] {
+  background: var(--raised);
+  color: var(--text);
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  z-index: 30;
+  min-width: 190px;
+  padding: 6px;
+  background: var(--raised);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-overlay);
+}
+
+.right {
+  right: 0;
+}
+
+.left {
+  left: 0;
+}
+
+.menu button {
+  display: block;
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: var(--radius-control);
+  text-align: left;
+  font: var(--type-body-sm);
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.menu button:hover:not(:disabled),
+.menu button:focus-visible {
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+}
+
+.menu button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.menu .danger {
+  color: var(--danger);
+}

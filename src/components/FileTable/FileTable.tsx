@@ -47,6 +47,8 @@ export type FileRowProps = {
   onSelect?: (selected: boolean, shift: boolean) => void
   onOpen?: () => void
   onMenu?: (e: ReactMouseEvent<HTMLButtonElement>) => void
+  // a ready-made menu (see Menu) instead of onMenu
+  actions?: ReactNode
 }
 
 // the most reused piece of the product: one file, its state and its menu
@@ -64,6 +66,7 @@ export function FileRow({
   onSelect,
   onOpen,
   onMenu,
+  actions,
 }: FileRowProps) {
   return (
     <div
@@ -109,7 +112,8 @@ export function FileRow({
         {who && <span className={styles.who}>{who}</span>}
       </span>
       <span role="cell" className={styles.actions}>
-        {onMenu && (
+        {actions}
+        {!actions && onMenu && (
           <button
             type="button"
             className={styles.menu}
