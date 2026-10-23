@@ -113,6 +113,7 @@ export default function VaultPage() {
       {files.isSuccess && items.length === 0 && (
         <div className={styles.empty}>
           <EmptyState
+            center
             icon="folder"
             title="This vault is empty"
             actions={
