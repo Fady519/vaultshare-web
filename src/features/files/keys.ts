@@ -61,7 +61,15 @@ export async function decryptFileName(file: FileDto) {
 export function useFileNames(files: FileDto[] | undefined) {
   const unlocked = useSession((s) => s.privateKey !== null)
   return useQuery({
-    queryKey: ['names', ...(files ?? []).map((f) => `${f.id}:${f.currentVersion.id}:${f.nameIv}`)],
+    // the wrapped key is part of the key: after a key-pair rotation the same version
+    // comes back wrapped differently and must be decrypted again
+    queryKey: [
+      'names',
+      ...(files ?? []).map(
+        (f) =>
+          `${f.id}:${f.currentVersion.id}:${f.nameIv}:${f.currentVersion.wrappedKey?.wrapped.slice(-12) ?? '-'}`,
+      ),
+    ],
     queryFn: async () => {
       const entries = await Promise.all(
         (files ?? []).map(async (f) => {
@@ -88,7 +96,10 @@ export function useFileName(file: FileDto | undefined) {
 export function useVersionNotes(versions: VersionDto[] | undefined) {
   const unlocked = useSession((s) => s.privateKey !== null)
   return useQuery({
-    queryKey: ['notes', ...(versions ?? []).map((v) => v.id)],
+    queryKey: [
+      'notes',
+      ...(versions ?? []).map((v) => `${v.id}:${v.wrappedKey?.wrapped.slice(-12) ?? '-'}`),
+    ],
     queryFn: async () => {
       const entries = await Promise.all(
         (versions ?? []).map(async (v) => {
