@@ -9,8 +9,28 @@
   overflow-y: auto;
 }
 
+.rail:focus {
+  outline: none;
+}
+
 .logo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 26px 24px 32px;
+}
+
+.close {
+  display: none;
+  padding: 6px;
+  margin: -6px -6px -6px 0;
+  border-radius: var(--radius-control);
+  color: var(--muted);
+}
+
+.close:hover {
+  background: var(--raised);
+  color: var(--text);
 }
 
 .nav {
@@ -143,4 +163,40 @@
   margin: auto 24px 0;
   padding: 20px 0 24px;
   border-top: 1px solid var(--rule-soft);
+}
+
+/* tablet and phone: a drawer over the page */
+@media (max-width: 1023px) {
+  .rail {
+    position: fixed;
+    left: 0;
+    z-index: 60;
+    width: min(var(--rail-w), 86vw);
+    height: 100dvh;
+    box-shadow: var(--shadow-overlay);
+    transform: translateX(-100%);
+    visibility: hidden;
+    transition:
+      transform 0.2s var(--ease),
+      visibility 0s 0.2s;
+  }
+
+  .open {
+    transform: none;
+    visibility: visible;
+    transition: transform 0.2s var(--ease);
+  }
+
+  .close {
+    display: inline-flex;
+  }
+
+  /* fingers need taller rows than a mouse */
+  .link {
+    height: 44px;
+  }
+
+  .vault {
+    height: 40px;
+  }
 }

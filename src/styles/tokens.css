@@ -101,8 +101,14 @@
 
   --shadow-overlay: 0 24px 64px rgba(0, 0, 0, 0.45);
 
+  /*
+    breakpoints from the book (table 3-31), written out in each media query
+    because custom properties don't work there:
+    phone < 640 · tablet 640–1023 · laptop 1024–1439 · desktop 1440+
+  */
   --rail-w: 248px;
   --topbar-h: 60px;
+  --tabbar-h: 64px;
   --content-max: 1112px;
 
   --ease: cubic-bezier(0.2, 0, 0, 1);

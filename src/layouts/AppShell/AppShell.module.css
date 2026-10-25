@@ -34,3 +34,33 @@
 .skip:focus {
   left: 8px;
 }
+
+.scrim {
+  display: none;
+}
+
+/* tablet and phone: the rail becomes a drawer */
+@media (max-width: 1023px) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: var(--scrim);
+  }
+
+  .content {
+    padding: 0 var(--s-24) var(--s-48);
+  }
+}
+
+/* phone: leave room for the tab bar */
+@media (max-width: 639px) {
+  .content {
+    padding: 0 var(--s-16) calc(var(--tabbar-h) + var(--s-32) + env(safe-area-inset-bottom));
+  }
+}

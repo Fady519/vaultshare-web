@@ -13,10 +13,12 @@
 }
 
 .crumbs {
+  flex: 1;
   display: flex;
   align-items: center;
   gap: 12px;
   min-width: 0;
+  overflow: hidden;
   font: var(--type-body-sm);
   font-size: 0.8125rem;
 }
@@ -31,6 +33,7 @@ a.crumb:hover {
 }
 
 .current {
+  min-width: 0;
   color: var(--text);
   font-weight: 500;
   white-space: nowrap;
@@ -66,6 +69,12 @@ a.crumb:hover {
   width: 300px;
 }
 
+@media (max-width: 1279px) {
+  .search {
+    width: 220px;
+  }
+}
+
 @media (max-width: 1023px) {
   .search {
     width: 200px;
@@ -87,4 +96,79 @@ a.crumb:hover {
   font-weight: 700;
   line-height: 16px;
   text-align: center;
+}
+
+.iconBtn {
+  display: none;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin-left: -8px;
+  border-radius: var(--radius-control);
+  color: var(--muted);
+}
+
+.iconBtn:hover {
+  background: var(--raised);
+  color: var(--text);
+}
+
+/* tablet: the rail is a drawer, so the bar gets a menu button */
+@media (max-width: 1023px) {
+  .bar {
+    gap: var(--s-12);
+    padding: 0 var(--s-24);
+  }
+
+  .iconBtn {
+    display: inline-flex;
+  }
+
+  .back,
+  .searchLink {
+    display: none;
+  }
+}
+
+/* phone: one crumb, a back arrow, search behind an icon */
+@media (max-width: 639px) {
+  .bar {
+    gap: var(--s-4);
+    padding: 0 var(--s-16);
+  }
+
+  .back,
+  .searchLink {
+    display: inline-flex;
+  }
+
+  .back {
+    margin-left: 0;
+  }
+
+  .crumbs {
+    margin-left: 4px;
+  }
+
+  .crumbs > :not(:last-child) {
+    display: none;
+  }
+
+  .current {
+    font-size: 0.875rem;
+  }
+
+  .tools {
+    gap: var(--s-4);
+  }
+
+  .search {
+    display: none;
+  }
+
+  .searchLink {
+    margin-left: 0;
+  }
 }

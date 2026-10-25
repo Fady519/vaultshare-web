@@ -59,11 +59,17 @@
     padding-top: var(--s-24);
   }
 
+  /* figma 29: no card on a phone, the screen is the card */
+  .card {
+    background: none;
+    border: 0;
+  }
+
   .body {
-    padding: 28px 20px;
+    padding: 8px 0 24px;
   }
 
   .foot {
-    padding: 16px 20px;
+    padding: 16px 0 0;
   }
 }

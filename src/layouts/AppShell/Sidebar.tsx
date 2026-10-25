@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { NavLink, useParams } from 'react-router-dom'
 import { Icon, Logo, Skeleton, type IconName } from '@/components'
 import { useVaults } from '@/api/vaults'
@@ -16,14 +17,39 @@ const NAV: { to: string; label: string; icon: IconName }[] = [
   { to: '/trash', label: 'Trash', icon: 'trash' },
 ]
 
-export function Sidebar() {
+// open/onClose only matter under 1024px, where the rail is a drawer
+export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { vaultId } = useParams()
   const vaults = useVaults()
+  const ref = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const opener = document.activeElement as HTMLElement | null
+    ref.current?.focus()
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      opener?.focus()
+    }
+  }, [open, onClose])
 
   return (
-    <aside className={styles.rail}>
+    <aside
+      ref={ref}
+      id="app-nav"
+      className={cx(styles.rail, open && styles.open)}
+      tabIndex={-1}
+      aria-label="Navigation"
+    >
       <div className={styles.logo}>
         <Logo to="/vaults" />
+        <button type="button" className={styles.close} onClick={onClose} aria-label="Close menu">
+          <Icon name="close" />
+        </button>
       </div>
 
       <nav aria-label="Main">

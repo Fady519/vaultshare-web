@@ -36,10 +36,11 @@ export function LockIndicator() {
       <Icon name="lock" size={12} />
       {unlocked ? (
         <>
-          Unlocked <span className={styles.time}>{mmss(left)}</span>
+          <span className={styles.word}>Unlocked</span>{' '}
+          <span className={styles.time}>{mmss(left)}</span>
         </>
       ) : (
-        'Locked'
+        <span className={styles.word}>Locked</span>
       )}
     </span>
   )

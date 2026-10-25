@@ -1,0 +1,39 @@
+.slot:empty {
+  display: none;
+}
+
+.banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 16px var(--s-40) 0;
+  padding: 12px 16px;
+  background: var(--warn-soft);
+  border: 1px solid var(--warn);
+  border-radius: var(--radius-card);
+  font: var(--type-body-sm);
+  color: var(--muted);
+}
+
+.banner strong {
+  font-weight: 600;
+  color: var(--warn);
+}
+
+.icon {
+  flex: none;
+  margin-top: 2px;
+  color: var(--warn);
+}
+
+@media (max-width: 1023px) {
+  .banner {
+    margin: 12px var(--s-24) 0;
+  }
+}
+
+@media (max-width: 639px) {
+  .banner {
+    margin: 12px var(--s-16) 0;
+  }
+}
