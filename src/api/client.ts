@@ -120,7 +120,12 @@ async function request<T>(method: string, path: string, opts: RequestOptions = {
     })
   } catch (err) {
     if ((err as Error).name === 'AbortError') throw err
-    throw new ApiError({ status: 0, title: 'Network error', code: 'NETWORK_ERROR' })
+    throw new ApiError({
+      status: 0,
+      title: 'Network error',
+      code: 'NETWORK_ERROR',
+      detail: 'The server could not be reached, so nothing was sent or changed.',
+    })
   }
 
   if (res.ok) {
@@ -131,10 +136,13 @@ async function request<T>(method: string, path: string, opts: RequestOptions = {
 
   const problem = await toProblem(res)
 
-  if (res.status === 401 && problem.code === 'TOKEN_EXPIRED' && !opts.retried) {
+  // expired token: refresh once. unknown token (this device was signed out elsewhere): the
+  // refresh fails too, and the session ends here instead of every page erroring on its own
+  const sessionCode = problem.code === 'TOKEN_EXPIRED' || problem.code === 'UNAUTHENTICATED'
+  if (res.status === 401 && token && sessionCode && !opts.retried) {
     const fresh = await refreshAccessToken()
     if (fresh) return request<T>(method, path, { ...opts, retried: true })
-    useSession.getState().clear()
+    useSession.getState().expire()
   }
 
   if (problem.code === 'STEP_UP_REQUIRED' && problem.action && stepUpHandler && !opts.retried) {

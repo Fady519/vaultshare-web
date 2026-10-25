@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Button, Callout, EmptyState, FileKindBox, Icon, TextField } from '@/components'
+import { Button, Callout, EmptyState, ErrorState, FileKindBox, Icon, TextField } from '@/components'
 import { StepCard } from '@/layouts/StepCard/StepCard'
 import { ApiError, errorMessage } from '@/api/client'
 import { sharingApi } from '@/api/sharing'
@@ -135,8 +135,16 @@ export default function OpenLinkPage() {
   if (state.kind === 'gone' || state.kind === 'no-key' || state.kind === 'broken') {
     return (
       <StepCard width={720}>
-        <EmptyState
+        <ErrorState
+          tone={state.kind === 'broken' ? 'danger' : 'warn'}
           icon="lock"
+          code={
+            state.kind === 'gone'
+              ? '410 · link gone'
+              : state.kind === 'no-key'
+                ? 'no key'
+                : 'broken'
+          }
           title={state.kind === 'gone' ? 'This link no longer works' : "This link can't be opened"}
         >
           {state.kind === 'gone'
@@ -144,7 +152,7 @@ export default function OpenLinkPage() {
             : state.kind === 'no-key'
               ? 'The part after # is missing, and that part is the key. Ask for the full link again.'
               : state.message}
-        </EmptyState>
+        </ErrorState>
       </StepCard>
     )
   }

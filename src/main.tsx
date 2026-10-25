@@ -2,6 +2,8 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
 import { MockOffline } from './features/errors/MockOffline'
+import { missingFeatures } from './features/errors/browserSupport'
+import { UnsupportedBrowser } from './features/errors/UnsupportedBrowser'
 import './styles/fonts.css'
 import './styles/tokens.css'
 import './styles/base.css'
@@ -10,6 +12,12 @@ const RELOAD_KEY = 'vaultshare.mock-reload'
 
 async function start() {
   const root = createRoot(document.getElementById('root')!)
+
+  const missing = missingFeatures()
+  if (missing.length) {
+    root.render(<UnsupportedBrowser missing={missing} />)
+    return
+  }
 
   // fake backend until the real one is ready (VITE_USE_MOCKS in .env)
   if (import.meta.env.VITE_USE_MOCKS === 'true') {

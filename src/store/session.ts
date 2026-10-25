@@ -34,6 +34,8 @@ type SessionState = {
   privateKey: CryptoKey | null
   // epoch ms when the idle lock kicks in
   lockAt: number | null
+  // the session ended on its own (refresh token expired or revoked), not by signing out
+  expired: boolean
 
   setSession: (accessToken: string, user: UserDto) => void
   setAccessToken: (token: string | null) => void
@@ -44,6 +46,17 @@ type SessionState = {
   touch: () => void
   lock: () => void
   clear: () => void
+  expire: () => void
+}
+
+const signedOut = {
+  user: null,
+  accessToken: null,
+  mfa: null,
+  wrapKey: null,
+  wrapSalt: null,
+  privateKey: null,
+  lockAt: null,
 }
 
 export const useSession = create<SessionState>((set, get) => ({
@@ -54,8 +67,9 @@ export const useSession = create<SessionState>((set, get) => ({
   wrapSalt: null,
   privateKey: null,
   lockAt: null,
+  expired: false,
 
-  setSession: (accessToken, user) => set({ accessToken, user, mfa: null }),
+  setSession: (accessToken, user) => set({ accessToken, user, mfa: null, expired: false }),
   setAccessToken: (accessToken) => set({ accessToken }),
   setUser: (user) => set({ user }),
   setMfa: (mfa) => set({ mfa }),
@@ -77,16 +91,8 @@ export const useSession = create<SessionState>((set, get) => ({
   // drop the key references so they can be garbage collected
   lock: () => set({ privateKey: null, wrapKey: null, wrapSalt: null, lockAt: null }),
 
-  clear: () =>
-    set({
-      user: null,
-      accessToken: null,
-      mfa: null,
-      wrapKey: null,
-      wrapSalt: null,
-      privateKey: null,
-      lockAt: null,
-    }),
+  clear: () => set({ ...signedOut, expired: false }),
+  expire: () => set({ ...signedOut, expired: true }),
 }))
 
 export const isUnlocked = () => useSession.getState().privateKey !== null

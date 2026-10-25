@@ -1,0 +1,76 @@
+.state {
+  --tone: var(--muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: var(--s-64) 0;
+  text-align: center;
+}
+
+.warn {
+  --tone: var(--warn);
+}
+
+.danger {
+  --tone: var(--danger);
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: var(--s-20);
+  background: var(--raised);
+  border: 1px solid var(--tone);
+  border-radius: var(--radius-card);
+  color: var(--tone);
+}
+
+.code {
+  font: var(--type-label);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--tone);
+}
+
+.neutral .code {
+  color: var(--faint);
+}
+
+.title {
+  margin-top: var(--s-8);
+  font: var(--type-h2);
+  letter-spacing: var(--ls-h2);
+}
+
+.text {
+  margin-top: var(--s-8);
+  font: var(--type-body-sm);
+  color: var(--muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--s-12);
+  margin-top: var(--s-32);
+}
+
+@media (max-width: 639px) {
+  .state {
+    padding: var(--s-40) 0;
+  }
+
+  .actions {
+    width: 100%;
+  }
+
+  .actions > * {
+    flex: 1 1 auto;
+  }
+}

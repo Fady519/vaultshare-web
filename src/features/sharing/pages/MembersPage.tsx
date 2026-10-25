@@ -4,7 +4,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import {
   Avatar,
   Button,
-  Callout,
   Icon,
   PageHead,
   SectionMark,
@@ -24,6 +23,7 @@ import { InviteDialog } from '../components/InviteDialog'
 import { PendingGrants } from '../components/PendingGrants'
 import { RevokeDialog } from '../components/RevokeDialog'
 import styles from './MembersPage.module.css'
+import { LoadError } from '@/features/errors/LoadError'
 
 const ROLE_OPTIONS = [
   { value: 'manager', label: 'Manager' },
@@ -65,11 +65,7 @@ export default function MembersPage() {
   )
 
   if (vault.isError) {
-    return (
-      <Callout tone="danger" title="This vault could not be opened">
-        It may have been deleted, or you are no longer a member.
-      </Callout>
-    )
+    return <LoadError error={vault.error} thing="vault" onRetry={() => vault.refetch()} />
   }
 
   const list = members.data ?? []

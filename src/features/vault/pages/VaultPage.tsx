@@ -30,6 +30,7 @@ import { ShareDialog } from '@/features/sharing/components/ShareDialog'
 import { PendingGrants } from '@/features/sharing/components/PendingGrants'
 import { BulkBar } from '../components/BulkBar'
 import styles from './VaultPage.module.css'
+import { LoadError } from '@/features/errors/LoadError'
 
 export default function VaultPage() {
   const { vaultId } = useParams()
@@ -58,14 +59,13 @@ export default function VaultPage() {
     return () => window.removeEventListener('keydown', onKey)
   }, [selection])
 
-  useCrumbs({ label: 'Vaults', to: '/vaults' }, vault.data?.name ?? '…')
+  useCrumbs(
+    { label: 'Vaults', to: '/vaults' },
+    vault.isError ? 'Unavailable' : (vault.data?.name ?? '…'),
+  )
 
   if (vault.isError) {
-    return (
-      <Callout tone="danger" title="This vault could not be opened">
-        It may have been deleted, or you are no longer a member.
-      </Callout>
-    )
+    return <LoadError error={vault.error} thing="vault" onRetry={() => vault.refetch()} />
   }
 
   const v = vault.data

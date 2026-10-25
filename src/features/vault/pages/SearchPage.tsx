@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Callout, Chip, FileKindBox, Menu, SearchBar, SkeletonRows } from '@/components'
+import { Callout, Chip, EmptyState, FileKindBox, Menu, SearchBar, SkeletonRows } from '@/components'
 import { useFileIndex } from '@/api/files'
 import type { FileDto } from '@/api/types'
 import { useCrumbs } from '@/hooks/useCrumbs'
@@ -199,9 +199,13 @@ export default function SearchPage() {
           </p>
 
           {(q || filtered) && hits.length === 0 && (
-            <p className={styles.none}>
-              Nothing matches. Names and notes are compared exactly as typed, case aside.
-            </p>
+            <EmptyState
+              icon="search"
+              title={q ? `No match for “${q}”` : 'Nothing matches these filters'}
+            >
+              Names are encrypted, so the search runs here in this tab over the {index.data.length}{' '}
+              files you can decrypt. Names and notes are compared as typed, case aside.
+            </EmptyState>
           )}
 
           {(q || filtered) && (

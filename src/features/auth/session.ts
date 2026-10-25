@@ -53,6 +53,11 @@ export async function restoreSession() {
   }
 }
 
+// however the session ends, nothing it loaded stays cached for whoever signs in next
+useSession.subscribe((state, prev) => {
+  if (prev.user && !state.user) queryClient.clear()
+})
+
 export async function signOut() {
   try {
     await authApi.logout()
@@ -60,7 +65,6 @@ export async function signOut() {
     // signing out locally is what matters
   }
   useSession.getState().clear()
-  queryClient.clear()
 }
 
 // invite links survive the whole sign-up flow in sessionStorage (just a token, not a secret)

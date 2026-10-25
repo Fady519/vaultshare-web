@@ -21,6 +21,7 @@ import { formatBytes, shortHash, timeAgo } from '@/utils/format'
 import { errorMessage } from '@/api/client'
 import { useFileName } from '../keys'
 import { canPreview, digestHex, usePlaintext } from '../plaintext'
+import { DecryptRefused } from '../components/DecryptRefused'
 import { DownloadPanel } from '../components/DownloadPanel'
 import { FilePreview } from '../components/FilePreview'
 import { MockTamper } from '../components/MockTamper'
@@ -29,6 +30,7 @@ import { ShareDialog } from '@/features/sharing/components/ShareDialog'
 import { fileAccess } from '../access'
 import { toggleFavorite, trashWithUndo } from '../actions'
 import styles from './FileDetailPage.module.css'
+import { LoadError, NoKeyState } from '@/features/errors/LoadError'
 
 // bigger files are only decrypted for a preview when asked to
 const AUTO_PREVIEW_BYTES = 25 * 1024 * 1024
@@ -68,16 +70,14 @@ export default function FileDetailPage() {
   useCrumbs(
     ...(access.viaShare ? [] : [{ label: 'Vaults', to: '/vaults' }]),
     access.crumb,
-    name ?? '…',
+    detail.isError ? 'Unavailable' : (name ?? '…'),
   )
 
   if (detail.isError) {
-    return (
-      <Callout tone="danger" title="This file could not be opened">
-        It may have been deleted, or you no longer have access to it.
-      </Callout>
-    )
+    return <LoadError error={detail.error} thing="file" onRetry={() => detail.refetch()} />
   }
+  // listed to me, but not one key for me: a pending member, or a version made before I joined
+  if (file && !file.currentVersion.wrappedKey) return <NoKeyState objectId={file.id} thing="file" />
 
   const v = file?.currentVersion
   const firstChunk = plain.data?.info.chunks[0]
@@ -163,8 +163,11 @@ export default function FileDetailPage() {
             </EmptyState>
           ) : plain.isError ? (
             <div className={styles.withheld}>
-              <p className={styles.withheldTitle}>Preview withheld</p>
-              <p>Nothing from this version was rendered because it did not pass verification.</p>
+              <DecryptRefused
+                error={plain.error}
+                chunkCount={file.currentVersion.chunkCount}
+                onRetry={() => plain.refetch()}
+              />
             </div>
           ) : (
             <>

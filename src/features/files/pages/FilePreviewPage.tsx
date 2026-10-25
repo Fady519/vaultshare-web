@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
-import { Button, Callout, EmptyState, PageHead, Skeleton } from '@/components'
+import { Button, EmptyState, PageHead, Skeleton } from '@/components'
 import { useFileDetail, useFileVersions } from '@/api/files'
-import { errorMessage } from '@/api/client'
 import { fromBase64, IntegrityError, toHex } from '@/crypto'
 import { useCrumbs } from '@/hooks/useCrumbs'
 import { cx } from '@/utils/cx'
@@ -14,6 +13,8 @@ import { FilePreview } from '../components/FilePreview'
 import { ShareDialog } from '@/features/sharing/components/ShareDialog'
 import { fileAccess } from '../access'
 import styles from './FilePreviewPage.module.css'
+import { LoadError } from '@/features/errors/LoadError'
+import { DecryptRefused } from '../components/DecryptRefused'
 
 // figma 36. ?v=<versionId> previews an older version from the history page
 export default function FilePreviewPage() {
@@ -42,11 +43,7 @@ export default function FilePreviewPage() {
   )
 
   if (detail.isError) {
-    return (
-      <Callout tone="danger" title="This file could not be opened">
-        It may have been deleted, or you no longer have access to it.
-      </Callout>
-    )
+    return <LoadError error={detail.error} thing="file" onRetry={() => detail.refetch()} />
   }
 
   const info = plain.data?.info
@@ -92,12 +89,11 @@ export default function FilePreviewPage() {
             </EmptyState>
           ) : plain.isError ? (
             <div className={styles.withheld}>
-              <p className={styles.withheldTitle}>Preview withheld</p>
-              <p>
-                {integrity
-                  ? `Chunk ${integrity.index + 1} did not verify, so nothing was rendered.`
-                  : errorMessage(plain.error)}
-              </p>
+              <DecryptRefused
+                error={plain.error}
+                chunkCount={version?.chunkCount ?? 1}
+                onRetry={() => plain.refetch()}
+              />
             </div>
           ) : plain.data && file ? (
             <FilePreview blob={plain.data.blob} mimeType={file.mimeType} name={name ?? 'file'} />

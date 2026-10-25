@@ -16,6 +16,7 @@ export default function SignInPage() {
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const next = safeNext(params.get('next'))
+  const expired = useSession((st) => st.expired)
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -100,6 +101,15 @@ export default function SignInPage() {
         <p className={s.lead}>
           Your password decrypts your private key in this browser. The server receives neither.
         </p>
+
+        {/* figma 50, "session expired" */}
+        {expired && (
+          <Callout tone="warn" icon="clock" title="Your session ended">
+            Your private key was wiped from this tab&apos;s memory and the sign-in stopped working:
+            it expired, or this device was signed out from another one. Sign in again to unwrap your
+            key.
+          </Callout>
+        )}
 
         <TextField
           label="Work email"

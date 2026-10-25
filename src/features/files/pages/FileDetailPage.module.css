@@ -28,22 +28,12 @@
 
 .withheld {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  height: 560px;
-  padding: 40px;
+  min-height: 420px;
+  padding: 0 32px;
   border: 1px dashed var(--danger);
   border-radius: var(--radius-card);
-  text-align: center;
-  font: var(--type-body-sm);
-  color: var(--muted);
-}
-
-.withheldTitle {
-  font-weight: 600;
-  color: var(--danger);
 }
 
 .caption {

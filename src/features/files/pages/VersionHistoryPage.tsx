@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Avatar, Button, Callout, PageHead, SkeletonRows, Tag } from '@/components'
+import { Avatar, Button, PageHead, SkeletonRows, Tag } from '@/components'
 import { useFileDetail, useFileVersions } from '@/api/files'
 import type { VersionDto } from '@/api/types'
 import { useCrumbs } from '@/hooks/useCrumbs'
@@ -14,6 +14,7 @@ import { RestoreDialog } from '../components/RestoreDialog'
 import { UploadPanel } from '../components/UploadPanel'
 import { fileAccess } from '../access'
 import styles from './VersionHistoryPage.module.css'
+import { LoadError } from '@/features/errors/LoadError'
 
 export default function VersionHistoryPage() {
   const { fileId } = useParams()
@@ -44,9 +45,11 @@ export default function VersionHistoryPage() {
 
   if (detail.isError || versions.isError) {
     return (
-      <Callout tone="danger" title="The version history could not be loaded">
-        The file may have been deleted, or you no longer have access to it.
-      </Callout>
+      <LoadError
+        error={detail.error ?? versions.error}
+        thing="file"
+        onRetry={() => (detail.isError ? detail.refetch() : versions.refetch())}
+      />
     )
   }
 

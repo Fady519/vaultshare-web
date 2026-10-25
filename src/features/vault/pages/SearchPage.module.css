@@ -28,12 +28,6 @@
   color: var(--faint);
 }
 
-.none {
-  padding: 24px 0;
-  font: var(--type-body-sm);
-  color: var(--muted);
-}
-
 .row {
   display: grid;
   grid-template-columns: 30px minmax(0, 1fr) 160px 50px 110px 90px;
@@ -97,4 +91,49 @@
   margin-top: 18px;
   font: var(--type-data-sm);
   color: var(--faint);
+}
+
+/* tablet: the owner column goes */
+@media (max-width: 1023px) {
+  .row {
+    grid-template-columns: 30px minmax(0, 1fr) 130px 40px 80px;
+  }
+
+  .owner {
+    display: none;
+  }
+}
+
+/* phone: icon and name, then vault and time under it */
+@media (max-width: 639px) {
+  .row {
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    grid-template-areas:
+      'kind text when'
+      'kind vault mono';
+    row-gap: 2px;
+    padding: 10px 0;
+  }
+
+  .row > :first-child {
+    grid-area: kind;
+  }
+
+  .text {
+    grid-area: text;
+  }
+
+  .vault {
+    grid-area: vault;
+    font: var(--type-data-sm);
+  }
+
+  .mono {
+    grid-area: mono;
+    text-align: right;
+  }
+
+  .when {
+    grid-area: when;
+  }
 }
