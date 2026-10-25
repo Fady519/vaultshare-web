@@ -122,7 +122,7 @@ export default function TrashPage() {
       )}
 
       {items.length > 0 && (
-        <div role="table" aria-label="Trash" className={styles.table}>
+        <div role="table" aria-label="Trash" className={cx(styles.table, 'stack-rows')}>
           <div role="row" className={cx(styles.row, styles.head)}>
             <span role="columnheader">File</span>
             <span role="columnheader">Size</span>

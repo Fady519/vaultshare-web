@@ -79,7 +79,11 @@ export default function VersionHistoryPage() {
       {versions.isPending && <SkeletonRows rows={4} />}
 
       {list.length > 0 && (
-        <div role="table" className={styles.table} aria-label="Versions">
+        <div
+          role="table"
+          className={cx(styles.table, 'stack-rows with-menu')}
+          aria-label="Versions"
+        >
           <div role="row" className={cx(styles.row, styles.headRow)}>
             <span role="columnheader">Version</span>
             <span role="columnheader">Author</span>
@@ -93,7 +97,7 @@ export default function VersionHistoryPage() {
             const isCurrent = v.id === current.id
             return (
               <div key={v.id} role="row" className={cx(styles.row, isCurrent && styles.current)}>
-                <span role="cell" className={styles.no}>
+                <span role="cell" className={styles.no} title={`sha256 ${digestHex(v.digest)}`}>
                   v{v.versionNo}
                   {isCurrent && <Tag tone="accent">Current</Tag>}
                   {!isCurrent && v.versionNo === 1 && <Tag>Original</Tag>}

@@ -134,3 +134,41 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* phone: the text gets the full width, controls go under it */
+@media (max-width: 639px) {
+  .sectionHead {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .row {
+    flex-wrap: wrap;
+    padding: 14px 16px;
+  }
+
+  .rowText {
+    flex: 1 1 calc(100% - 32px);
+  }
+
+  .rowActions {
+    flex-wrap: wrap;
+    margin-left: auto;
+  }
+
+  .buttons {
+    flex-wrap: wrap;
+  }
+
+  .cards {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .card {
+    padding: 14px;
+  }
+
+  .cardValue {
+    font-size: 1.25rem;
+  }
+}

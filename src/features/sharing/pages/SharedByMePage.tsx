@@ -114,7 +114,7 @@ export default function SharedByMePage() {
       )}
 
       {rows.length > 0 && (
-        <div role="table" aria-label="Shared by me" className={styles.table}>
+        <div role="table" aria-label="Shared by me" className={cx(styles.table, 'stack-rows')}>
           <div role="row" className={cx(styles.row, styles.byMe, styles.head)}>
             <span role="columnheader">File</span>
             <span role="columnheader">Shared with</span>

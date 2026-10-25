@@ -113,3 +113,41 @@
   margin-top: 16px;
   max-width: 520px;
 }
+
+@media (max-width: 1279px) {
+  .row {
+    grid-template-columns:
+      44px 100px minmax(110px, 1fr) minmax(110px, 1fr) minmax(120px, 1.2fr)
+      76px;
+    gap: 10px;
+  }
+}
+
+/* phone: "#34 · time" on top, the event under it, then who and what */
+@media (max-width: 639px) {
+  .filters {
+    flex-wrap: wrap;
+  }
+
+  .filters > * {
+    flex: 1 1 100%;
+  }
+
+  .table .row > :first-child {
+    flex: 0 0 auto;
+  }
+
+  .event {
+    flex: 1 1 100%;
+    order: 1;
+  }
+
+  .actor,
+  .resource {
+    order: 2;
+  }
+
+  .hash {
+    order: 3;
+  }
+}

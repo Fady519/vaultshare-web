@@ -106,7 +106,7 @@ export default function TeamPage() {
       {team.isPending && <SkeletonRows rows={5} />}
 
       {list.length > 0 && (
-        <div role="table" aria-label="Team" className={styles.table}>
+        <div role="table" aria-label="Team" className={cx(styles.table, 'stack-rows with-menu')}>
           <div role="row" className={cx(styles.row, styles.head)}>
             <span role="columnheader">Member</span>
             <span role="columnheader">Workspace role</span>

@@ -56,3 +56,31 @@
     border-left: 0;
   }
 }
+
+/* phone: one scrolling strip of tabs instead of a block of links */
+@media (max-width: 639px) {
+  .grid {
+    gap: 20px;
+  }
+
+  .nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin: 0 calc(-1 * var(--s-16));
+    padding: 0 var(--s-16);
+    border-bottom: 1px solid var(--rule-soft);
+    scrollbar-width: none;
+  }
+
+  .link {
+    flex: none;
+    border-left: 0;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+  }
+
+  .active {
+    border-bottom-color: var(--accent);
+    background: none;
+  }
+}

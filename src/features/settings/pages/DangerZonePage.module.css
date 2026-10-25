@@ -64,3 +64,21 @@
   font: var(--type-data-sm);
   color: var(--accent);
 }
+
+/* phone: the action goes under the explanation */
+@media (max-width: 639px) {
+  .item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    padding: 16px;
+  }
+
+  .inline {
+    flex-wrap: wrap;
+  }
+
+  .inline > * {
+    flex: 1 1 auto;
+  }
+}

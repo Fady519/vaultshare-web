@@ -7,6 +7,7 @@ import {
   DataGrid,
   FileKindBox,
   HashBlock,
+  Icon,
   Modal,
   ProgressBar,
   SectionMark,
@@ -147,9 +148,18 @@ export function UploadPanel({ open, onClose, vaultId, vaultName, initialFiles, e
         finished ? (
           <Button onClick={close}>Done</Button>
         ) : running ? (
-          <Button variant="ghost" onClick={() => abortRef.current?.abort()}>
-            Cancel
-          </Button>
+          <>
+            {/* the sheet scrolls on a phone, this line stays put (figma 53) */}
+            {p && (
+              <span className={styles.footStatus} aria-hidden>
+                <Icon name="lock" size={12} />
+                {STAGE_TEXT[p.stage]} · {pct}%
+              </span>
+            )}
+            <Button variant="ghost" onClick={() => abortRef.current?.abort()}>
+              Cancel
+            </Button>
+          </>
         ) : (
           <>
             <Button variant="ghost" onClick={close}>

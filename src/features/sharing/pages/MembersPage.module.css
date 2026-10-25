@@ -107,3 +107,42 @@
   font: var(--type-data-sm);
   color: var(--faint);
 }
+
+/* phone: name on the first line, the controls under it, the matrix scrolls sideways */
+@media (max-width: 639px) {
+  .member {
+    flex-wrap: wrap;
+    gap: 10px 14px;
+    padding: 14px;
+  }
+
+  .who {
+    flex: 1 1 calc(100% - 44px);
+  }
+
+  .who span {
+    overflow-wrap: anywhere;
+  }
+
+  .who + * {
+    margin-left: 44px;
+  }
+
+  .role {
+    min-width: 0;
+    text-align: left;
+  }
+
+  .matrixHead {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .matrixWrap {
+    overflow-x: auto;
+  }
+
+  .matrix {
+    min-width: 560px;
+  }
+}

@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { Button, Callout, Checkbox, SectionMark, TextField } from '@/components'
+import { Button, Callout, Checkbox, Icon, SectionMark, TextField } from '@/components'
 import { AuthSplit } from '@/layouts/AuthSplit/AuthSplit'
 import { authApi } from '@/api/auth'
 import { ApiError, errorMessage } from '@/api/client'
@@ -117,7 +117,7 @@ export default function SignInPage() {
           onChange={(e) => setPassword(e.target.value)}
           hint={
             busy
-              ? 'Deriving your key · Argon2id 64 MiB · about a second'
+              ? 'Deriving your key · Argon2id 64 MiB · a second or two, longer on a phone'
               : 'Unwraps your RSA-4096 private key locally.'
           }
         />
@@ -142,6 +142,18 @@ export default function SignInPage() {
             No account yet? <Link to="/signup">Create a vault</Link>
           </span>
         </div>
+
+        {/* figma 52: phones get told why unlocking takes a moment */}
+        <aside className={s.phoneNote}>
+          <Icon name="key" className={s.phoneNoteIcon} />
+          <div>
+            <p className={s.phoneNoteTitle}>Slower on a phone, on purpose</p>
+            <p className={s.mono}>
+              Argon2id needs 64 MiB of memory to turn your password into a key. A phone takes a few
+              seconds; anyone holding a stolen copy of the database pays the same for every guess.
+            </p>
+          </div>
+        </aside>
       </form>
     </AuthSplit>
   )

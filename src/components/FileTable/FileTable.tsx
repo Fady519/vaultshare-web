@@ -121,7 +121,7 @@ export function FileRow({
       <span role="cell" className={styles.version}>
         {version}
       </span>
-      <span role="cell">
+      <span role="cell" className={styles.people}>
         <AvatarStack people={people} />
       </span>
       <span role="cell" className={styles.when}>

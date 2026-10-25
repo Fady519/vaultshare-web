@@ -99,3 +99,22 @@
   font: var(--type-micro);
   color: var(--faint);
 }
+
+.footStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: auto;
+  font: var(--type-data-sm);
+  color: var(--accent);
+}
+
+@media (max-width: 639px) {
+  .queue {
+    max-height: none;
+  }
+
+  .footStatus {
+    flex: 1 1 100%;
+  }
+}

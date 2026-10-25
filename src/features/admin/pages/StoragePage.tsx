@@ -63,7 +63,7 @@ export default function StoragePage() {
 
           <section className={s.section}>
             <SectionMark num="01">Per vault</SectionMark>
-            <div role="table" aria-label="Storage per vault">
+            <div role="table" aria-label="Storage per vault" className="stack-rows">
               <div role="row" className={`${styles.row} ${styles.head}`}>
                 <span role="columnheader">Vault</span>
                 <span role="columnheader">Ciphertext</span>
@@ -88,12 +88,15 @@ export default function StoragePage() {
                   </span>
                   <span role="cell" className={styles.mono}>
                     {v.fileCount}
+                    <span className={styles.unit}> files</span>
                   </span>
                   <span role="cell" className={styles.mono}>
                     {v.versionCount}
+                    <span className={styles.unit}> versions</span>
                   </span>
                   <span role="cell" className={styles.mono}>
                     {v.memberCount}
+                    <span className={styles.unit}> members</span>
                   </span>
                 </div>
               ))}

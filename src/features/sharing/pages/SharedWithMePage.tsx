@@ -57,7 +57,11 @@ export default function SharedWithMePage() {
       )}
 
       {list.length > 0 && (
-        <div role="table" aria-label="Shared with me" className={styles.table}>
+        <div
+          role="table"
+          aria-label="Shared with me"
+          className={cx(styles.table, 'stack-rows with-menu')}
+        >
           <div role="row" className={cx(styles.row, styles.withMe, styles.head)}>
             <span role="columnheader">File</span>
             <span role="columnheader">Shared by</span>

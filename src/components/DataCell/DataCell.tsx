@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { cx } from '@/utils/cx'
 import styles from './DataCell.module.css'
 
@@ -20,7 +20,7 @@ export function DataCell({ label, children, tone = 'default', className }: Props
 
 export function DataGrid({ children, cols = 3 }: { children: ReactNode; cols?: number }) {
   return (
-    <dl className={styles.grid} style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
+    <dl className={styles.grid} style={{ '--cols': cols } as CSSProperties}>
       {children}
     </dl>
   )

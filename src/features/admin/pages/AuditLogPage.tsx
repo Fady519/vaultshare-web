@@ -215,7 +215,7 @@ export default function AuditLogPage() {
       )}
 
       {items.length > 0 && (
-        <div role="table" aria-label="Audit log" className={styles.table}>
+        <div role="table" aria-label="Audit log" className={cx(styles.table, 'stack-rows')}>
           <div role="row" className={cx(styles.row, styles.head)}>
             <span role="columnheader">#</span>
             <span role="columnheader">Time</span>

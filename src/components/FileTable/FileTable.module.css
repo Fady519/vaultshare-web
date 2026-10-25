@@ -169,3 +169,69 @@
     display: none;
   }
 }
+
+/* phone (figma 28): one line per file, version on the right, the whole row opens it */
+@media (max-width: 639px) {
+  .table,
+  .selectable {
+    --cols: minmax(0, 1fr) auto 32px;
+  }
+
+  .head,
+  .check,
+  .cipher,
+  .people,
+  .who {
+    display: none;
+  }
+
+  .row {
+    position: relative;
+    grid-template-areas:
+      'file version actions'
+      'file when actions';
+    row-gap: 2px;
+    height: auto;
+    min-height: 64px;
+    padding: 10px 0;
+  }
+
+  .file {
+    grid-area: file;
+  }
+
+  .version {
+    grid-area: version;
+    align-self: end;
+    text-align: right;
+  }
+
+  .when {
+    grid-area: when;
+    align-self: start;
+    align-items: flex-end;
+    font: var(--type-data-sm);
+    color: var(--faint);
+  }
+
+  .actions {
+    grid-area: actions;
+    position: relative;
+    z-index: 1;
+  }
+
+  .name {
+    font-size: 0.9375rem;
+  }
+
+  .name::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .menu {
+    width: 36px;
+    height: 36px;
+  }
+}

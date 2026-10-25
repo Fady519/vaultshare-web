@@ -6,6 +6,7 @@ import {
   EmptyState,
   FileRow,
   FileTable,
+  Icon,
   Menu,
   Skeleton,
   SkeletonRows,
@@ -276,6 +277,17 @@ export default function VaultPage() {
             <span>Every row is ciphertext at rest. File names are encrypted metadata.</span>
           </footer>
         </>
+      )}
+
+      {canWrite && (
+        <button
+          type="button"
+          className={styles.fab}
+          onClick={() => openUpload()}
+          aria-label={`Upload files to ${v?.name ?? 'this vault'}`}
+        >
+          <Icon name="upload" size={20} />
+        </button>
       )}
 
       {dragging && (

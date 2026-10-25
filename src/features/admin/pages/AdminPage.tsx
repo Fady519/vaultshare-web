@@ -147,7 +147,7 @@ export default function AdminPage() {
             an admin can suspend a member, never read their files
           </span>
         </div>
-        <div role="table" aria-label="Members">
+        <div role="table" aria-label="Members" className="stack-rows with-menu">
           <div role="row" className={cx(styles.row, styles.head)}>
             <span role="columnheader">Member</span>
             <span role="columnheader">Role</span>

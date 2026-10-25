@@ -145,3 +145,49 @@
   font: var(--type-data-sm);
   color: var(--faint);
 }
+
+/* laptop: the digest column goes, it stays in the version number's tooltip */
+@media (max-width: 1439px) {
+  .row {
+    grid-template-columns: 96px minmax(130px, 1.2fr) 100px 70px minmax(110px, 1.4fr) 236px;
+  }
+
+  .row > :nth-child(5) {
+    display: none;
+  }
+
+  .no {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+
+/* small laptop and tablet: size goes too */
+@media (max-width: 1279px) {
+  .row {
+    grid-template-columns: 90px minmax(100px, 1fr) 92px minmax(90px, 1fr) 236px;
+    gap: 12px;
+  }
+
+  .row > :nth-child(4) {
+    display: none;
+  }
+}
+
+/* phone: rows stack (see .stack-rows), keep the inset for the current-version bar */
+@media (max-width: 639px) {
+  .table .row {
+    padding-left: 12px;
+  }
+
+  .table .row > :nth-child(4),
+  .table .row > :nth-child(5) {
+    display: block;
+  }
+
+  .table .no {
+    flex-direction: row;
+    align-items: center;
+  }
+}

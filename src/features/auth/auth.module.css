@@ -91,3 +91,30 @@
 .footerEnd {
   margin-left: auto;
 }
+
+.phoneNote {
+  display: none;
+}
+
+@media (max-width: 639px) {
+  .phoneNote {
+    display: flex;
+    gap: 14px;
+    padding: 16px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-card);
+  }
+}
+
+.phoneNoteIcon {
+  flex: none;
+  margin-top: 2px;
+  color: var(--accent);
+}
+
+.phoneNoteTitle {
+  margin-bottom: 4px;
+  font: var(--type-body-sm);
+  font-weight: 600;
+}

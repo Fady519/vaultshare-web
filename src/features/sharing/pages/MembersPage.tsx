@@ -191,34 +191,36 @@ export default function MembersPage() {
         <SectionMark num="02">What each role can do</SectionMark>
         <span>a role is a set of wrapped keys plus what the server allows</span>
       </div>
-      <table className={styles.matrix}>
-        <thead>
-          <tr>
-            <th scope="col">Capability</th>
-            {COLUMNS.map((c) => (
-              <th key={c} scope="col">
-                {c}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {MATRIX.map((row) => (
-            <tr key={row.what}>
-              <th scope="row">{row.what}</th>
+      <div className={styles.matrixWrap}>
+        <table className={styles.matrix}>
+          <thead>
+            <tr>
+              <th scope="col">Capability</th>
               {COLUMNS.map((c) => (
-                <td key={c}>
-                  {row.who.includes(c) ? (
-                    <Icon name="check" size={14} label="yes" />
-                  ) : (
-                    <span aria-label="no">—</span>
-                  )}
-                </td>
+                <th key={c} scope="col">
+                  {c}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {MATRIX.map((row) => (
+              <tr key={row.what}>
+                <th scope="row">{row.what}</th>
+                {COLUMNS.map((c) => (
+                  <td key={c}>
+                    {row.who.includes(c) ? (
+                      <Icon name="check" size={14} label="yes" />
+                    ) : (
+                      <span aria-label="no">—</span>
+                    )}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <p className={styles.note}>
         Changing a role changes what the server lets someone do; a viewer still holds keys and can
         still read. Removing someone deletes their wrapped keys, and rotating makes any key they

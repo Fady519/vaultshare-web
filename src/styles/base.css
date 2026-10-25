@@ -108,6 +108,54 @@ pre {
   font-family: var(--font-mono);
 }
 
+/*
+  phone: the grid tables (div role="table") turn into stacked rows. the first
+  cell gets its own line, the rest wrap under it. tables with a menu in the last
+  cell add .with-menu so it sits in the top-right corner. pages fine-tune the rest
+*/
+@media (max-width: 639px) {
+  .stack-rows [role='row'] {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 14px;
+    height: auto;
+    min-height: 0;
+    padding: 12px 0;
+  }
+
+  .stack-rows [role='row'] > :first-child {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .stack-rows [role='row'] > [role='cell']:empty {
+    display: none;
+  }
+
+  /* column titles stay for screen readers only */
+  .stack-rows [role='row']:has(> [role='columnheader']) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+
+  .stack-rows.with-menu [role='row'] {
+    padding-right: 44px;
+  }
+
+  .stack-rows.with-menu [role='row'] > :last-child {
+    position: absolute;
+    top: 10px;
+    right: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

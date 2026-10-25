@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react'
-import { NavLink } from 'react-router-dom'
+import { useEffect, useRef, type ReactNode } from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
 import { PageHead } from '@/components'
 import { useCrumbs } from '@/hooks/useCrumbs'
 import { cx } from '@/utils/cx'
@@ -25,11 +25,20 @@ type Props = {
 // figma 26: settings pages share the left menu; each page is still its own route
 export function SettingsLayout({ title, crumb, meta, actions, children }: Props) {
   useCrumbs({ label: 'Settings', to: '/settings/profile' }, crumb)
+  const navRef = useRef<HTMLElement>(null)
+  const { pathname } = useLocation()
+
+  // on a phone the menu is a sideways strip: keep the open page's tab in view
+  useEffect(() => {
+    const active = navRef.current?.querySelector<HTMLElement>('[aria-current="page"]')
+    active?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+  }, [pathname])
+
   return (
     <>
       <PageHead title={title} meta={meta} actions={actions} />
       <div className={styles.grid}>
-        <nav aria-label="Settings" className={styles.nav}>
+        <nav ref={navRef} aria-label="Settings" className={styles.nav}>
           {NAV.map((n) => (
             <NavLink
               key={n.to}

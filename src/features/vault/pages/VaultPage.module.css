@@ -80,3 +80,53 @@
 .notice {
   margin-top: 16px;
 }
+
+.fab {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .head {
+    flex-wrap: wrap;
+  }
+}
+
+/* phone (figma 28): upload moves to a thumb-sized button above the tab bar */
+@media (max-width: 639px) {
+  .head {
+    padding: 24px 0 16px;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .actions > :last-child,
+  .foot > :last-child {
+    display: none;
+  }
+
+  .fab {
+    position: fixed;
+    right: 16px;
+    bottom: calc(var(--tabbar-h) + 16px + env(safe-area-inset-bottom));
+    z-index: 30;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-card);
+    background: var(--accent);
+    color: var(--on-accent);
+    box-shadow: var(--shadow-overlay);
+  }
+
+  .empty {
+    padding-top: 32px;
+  }
+
+  .emptyDrop {
+    display: none;
+  }
+}

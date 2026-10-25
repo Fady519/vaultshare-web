@@ -64,3 +64,19 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* phone: the algorithm is the same on every row, the fingerprint wraps */
+@media (max-width: 639px) {
+  .table th:nth-child(3),
+  .table td:nth-child(3) {
+    display: none;
+  }
+
+  .table td:nth-child(2) {
+    overflow-wrap: anywhere;
+  }
+
+  .table th {
+    letter-spacing: 0.5px;
+  }
+}
