@@ -6,6 +6,10 @@ Frontend of **VaultShare**, a zero-knowledge encrypted file collaboration platfo
 Files are encrypted in the browser before upload. The server only ever stores ciphertext,
 wrapped keys and an append-only audit chain, so nothing it holds is enough to read a file.
 
+**v1.0.0** — every screen of the Figma file is built, on phones, tablets and desktops, and runs
+against a mock API with the exact contract the backend implements (see
+[Handing over to the backend](#handing-over-to-the-backend)).
+
 | | |
 |---|---|
 | Frontend | Fady Kaiser |
@@ -102,6 +106,10 @@ stand-in for an S3 bucket.
   the box again to undo it.
 - *Administration → ⋯ → Suspend* ends that person's sessions at once, and signing in tells
   them an administrator suspended the account.
+- **Error and empty states (figma 50 / 51):** open `/vaults/anything` for the 404 card, flip
+  a byte with the mock storage box to get "Decryption refused", or switch DevTools → Network
+  to *Offline* to see the offline banner. Signing out from another tab ends this one's session:
+  the next request sends you to sign in with a "Your session ended" note.
 - When the mock data format changes the database is rebuilt on its own (it was in phases 3,
   4, 5 and 6), so files you uploaded earlier disappear. `/dev/ui` → "Reset mock data" does the same.
 
@@ -111,6 +119,33 @@ stand-in for an S3 bucket.
 - `/vaults` — the app shell (needs sign-in)
 - `/dev/ui` — every component on one page (compare with Figma screen 55). Has a
   "Reset mock data" button.
+
+## Phones, tablets and accessibility
+
+The four breakpoints from the book (table 3-31):
+
+| Width | Layout |
+|---|---|
+| under 640 px | phone: tab bar at the bottom (Vaults · Shared · Recent · Settings), the rail is a drawer behind ☰, one crumb with a back arrow, tables become stacked rows, dialogs become bottom sheets, upload is the round button above the tab bar |
+| 640–1023 px | tablet: the rail is a drawer, the rest is the desktop layout with fewer columns |
+| 1024–1439 px | laptop: rail + top bar, wide tables drop their least useful column |
+| 1440 px and up | desktop, as drawn in Figma |
+
+To try the phone layout, use Chrome DevTools' device toolbar (`Ctrl+Shift+M`). On a real
+phone the page has to be served over HTTPS: browsers only offer Web Crypto on HTTPS and on
+`localhost`, and on a plain-HTTP address the app shows "Open VaultShare over HTTPS" instead of
+running with weaker crypto.
+
+Accessibility targets WCAG 2.1 AA (book table 3-32):
+
+- axe-core reports no violations on any page, at 1280 px and at 390 px.
+- Two Figma colours were adjusted for contrast: faint text is `#898f87` on dark (was
+  `#5f655d`, 3.1:1) and `#6e6b62` on paper (was `#9a978e`, 2.6:1), so the lowest text
+  contrast anywhere is 4.7:1. Two avatar colours were lightened for the same reason.
+- Everything works from the keyboard: a skip link, the row menus and the account menu (arrow
+  keys, Esc gives focus back), dialogs trap focus and return it, the drawer closes on Esc.
+- Encryption progress, key rotation, the lock and integrity failures are announced through
+  live regions. Animations stop under `prefers-reduced-motion`.
 
 ## Mock API vs real backend
 
@@ -132,6 +167,18 @@ The API contract is section 10 of the roadmap PDF. In code it lives in
 [`src/api/types.ts`](src/api/types.ts) (every DTO) and [`src/mocks/handlers`](src/mocks/handlers)
 (how every endpoint answers).
 
+## Handing over to the backend
+
+1. Implement section 10 of *VaultShare - Frontend Roadmap.pdf*. Each phase added a dated
+   "تحديث بعد المرحلة" note there with what changed; [`src/api/types.ts`](src/api/types.ts) is
+   the same contract in code, and [`src/mocks/handlers`](src/mocks/handlers) shows how every
+   endpoint answers, errors included.
+2. Two rules the frontend relies on: a vault or file the caller can't see is `404 NOT_FOUND`,
+   never `403` (existence doesn't leak), and a revoked or unknown access token is
+   `401 UNAUTHENTICATED` while an expired one is `401 TOKEN_EXPIRED`.
+3. Set `VITE_USE_MOCKS=false` and `VITE_API_TARGET`, run the same click-through as above.
+   The `/__dev/*` endpoints and the dashed orange boxes are mock-only.
+
 ## Project structure
 
 ```
@@ -139,8 +186,8 @@ src/
   App.tsx          all routes
   styles/          tokens.css (from figma), base.css, fonts.css
   components/      the design-system components + the 23 icons
-  layouts/         AppShell (rail + topbar), AuthSplit, StepCard, PublicLayout
-  features/        one folder per area: auth, vault, files, sharing, settings, admin
+  layouts/         AppShell (rail + topbar, drawer + tab bar on small screens), AuthSplit, StepCard, PublicLayout
+  features/        one folder per area: auth, vault, files, sharing, settings, admin, errors
   crypto/          the only place encryption code is written (Argon2id, HKDF, AES-GCM, RSA-OAEP)
   api/             fetch client, DTO types, TanStack Query hooks
   mocks/           MSW fake server + its local "database"
@@ -153,7 +200,8 @@ src/
 - Passwords, private keys, file keys and plaintext never leave the browser and are never
   written to `localStorage`, logs or URLs.
 - Encryption code only lives in `src/crypto`, API calls only in `src/api`.
-- The unwrapped private key is held in memory and dropped on idle lock (15 min).
+- The unwrapped private key is held in memory and dropped on idle lock (15 min by default,
+  5–60 per person). Ending the session for any reason also empties every cached list.
 
 ## Roadmap
 
@@ -165,4 +213,4 @@ src/
 | 4 | Vault & files II — rename/move, delete, bulk, favorites, recent, search, trash | done |
 | 5 | Sharing & permissions — share, step-up, secure links, members, invites | done |
 | 6 | Settings & admin — security, sessions, keys, notifications, team, storage, audit | done |
-| 7 | Mobile layouts, error/empty/loading states, accessibility pass, v1.0.0 | |
+| 7 | Mobile layouts, error/empty/loading states, accessibility pass, v1.0.0 | done |
