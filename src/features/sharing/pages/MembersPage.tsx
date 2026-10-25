@@ -187,7 +187,13 @@ export default function MembersPage() {
         <SectionMark num="02">What each role can do</SectionMark>
         <span>a role is a set of wrapped keys plus what the server allows</span>
       </div>
-      <div className={styles.matrixWrap}>
+      {/* scrolls sideways on a phone, so it has to take focus for keyboard users */}
+      <div
+        className={styles.matrixWrap}
+        tabIndex={0}
+        role="region"
+        aria-label="What each role can do"
+      >
         <table className={styles.matrix}>
           <thead>
             <tr>

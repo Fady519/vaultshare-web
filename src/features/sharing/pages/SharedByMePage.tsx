@@ -121,7 +121,9 @@ export default function SharedByMePage() {
             <span role="columnheader">Role</span>
             <span role="columnheader">Secure link</span>
             <span role="columnheader">Access expires</span>
-            <span role="columnheader" aria-label="Actions" />
+            <span role="columnheader">
+              <span className="sr-only">Actions</span>
+            </span>
           </div>
           {rows.map((r) => {
             const name = nameOf(r.file)

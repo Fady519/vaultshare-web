@@ -3,7 +3,8 @@ import { cx } from '@/utils/cx'
 import styles from './Avatar.module.css'
 
 // same tones as the avatars in the figma file
-const TONES = ['#57C79E', '#5E7FA8', '#A8795E', '#7A6BA8', '#8E948B']
+// each one keeps the dark initials above 4.5:1
+const TONES = ['#57C79E', '#6A8BB4', '#A8795E', '#8D80BB', '#8E948B']
 
 function toneFor(seed: string) {
   let h = 0

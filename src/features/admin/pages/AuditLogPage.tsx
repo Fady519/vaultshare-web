@@ -315,7 +315,7 @@ function AuditTamper({ onChange }: { onChange: () => void }) {
 
   if (seq === undefined) return null
   return (
-    <aside className={cx(helper.box, styles.tamper)}>
+    <div role="note" className={cx(helper.box, styles.tamper)}>
       <span className={helper.tag}>Mock server · database</span>
       <p className={helper.text}>
         {seq
@@ -332,6 +332,6 @@ function AuditTamper({ onChange }: { onChange: () => void }) {
       >
         {seq ? 'Undo the edit' : 'Tamper with an entry'}
       </button>
-    </aside>
+    </div>
   )
 }

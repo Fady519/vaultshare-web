@@ -113,7 +113,9 @@ export default function TeamPage() {
             <span role="columnheader">Vaults</span>
             <span role="columnheader">Status</span>
             <span role="columnheader">Last active</span>
-            <span role="columnheader" aria-label="Actions" />
+            <span role="columnheader">
+              <span className="sr-only">Actions</span>
+            </span>
           </div>
           {list.map((m) => {
             const st = statusOf(m)

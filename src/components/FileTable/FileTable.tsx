@@ -40,7 +40,9 @@ export function FileTable({
             {c}
           </span>
         ))}
-        <span role="columnheader" aria-label="Actions" />
+        <span role="columnheader">
+          <span className="sr-only">Actions</span>
+        </span>
       </div>
       <div role="rowgroup">{children}</div>
     </div>

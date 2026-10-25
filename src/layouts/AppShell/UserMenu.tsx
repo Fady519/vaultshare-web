@@ -26,11 +26,25 @@ export function UserMenu() {
 
   useEffect(() => {
     if (!open) return
+    // same keys as the row menus: focus moves in, arrows walk, Esc gives focus back
+    const items = () => [
+      ...(wrapRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? []),
+    ]
+    items()[0]?.focus()
     function onDown(e: MouseEvent) {
       if (!wrapRef.current?.contains(e.target as Node)) setOpen(false)
     }
     function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setOpen(false)
+      const list = items()
+      const i = list.indexOf(document.activeElement as HTMLElement)
+      if (e.key === 'Escape') {
+        setOpen(false)
+        wrapRef.current?.querySelector<HTMLElement>('[aria-haspopup]')?.focus()
+      } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault()
+        const step = e.key === 'ArrowDown' ? 1 : -1
+        list[(i + step + list.length) % list.length]?.focus()
+      }
     }
     document.addEventListener('mousedown', onDown)
     document.addEventListener('keydown', onKey)

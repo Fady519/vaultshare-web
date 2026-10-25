@@ -37,6 +37,10 @@ export function AppShell() {
         </main>
       </div>
       <BottomNav />
+      {/* book 3.23 (4.1.3): screen readers hear the lock without moving focus */}
+      <p className="sr-only" role="status">
+        {unlocked ? '' : 'Vault locked. Your private key is no longer in memory on this device.'}
+      </p>
       <StepUpHost />
     </div>
   )

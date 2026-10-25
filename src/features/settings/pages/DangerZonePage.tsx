@@ -252,7 +252,7 @@ function RotateVaultDialog({
         </p>
         {progress && (
           <>
-            <p className={styles.progressText}>
+            <p className={styles.progressText} role="status">
               {progress.done} of {progress.total} versions
               {progress.current ? ` · now ${progress.current}` : ''}
             </p>

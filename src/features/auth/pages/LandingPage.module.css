@@ -150,6 +150,11 @@
   color: var(--faint);
 }
 
+/* the dark panel sits on paper, so it needs the dark theme's faint */
+.ink .panelLabel {
+  color: var(--dark-faint);
+}
+
 .panelTitle {
   width: 100%;
   padding-bottom: 14px;

@@ -94,7 +94,9 @@ export default function VersionHistoryPage() {
             <span role="columnheader">Size</span>
             <span role="columnheader">Ciphertext digest</span>
             <span role="columnheader">Note</span>
-            <span role="columnheader" aria-label="Actions" />
+            <span role="columnheader">
+              <span className="sr-only">Actions</span>
+            </span>
           </div>
           {list.map((v) => {
             const isCurrent = v.id === current.id

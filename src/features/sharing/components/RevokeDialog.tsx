@@ -145,7 +145,7 @@ export function RevokeDialog(props: Props) {
 
         {progress && (
           <div className={styles.progress}>
-            <p>
+            <p role="status">
               Rotating {progress.current ? `${progress.current} · ` : ''}
               {progress.done} of {progress.total} versions
             </p>

@@ -37,7 +37,7 @@ export function MockInbox({
   if (!mocksOn) return null
 
   return (
-    <aside className={styles.box}>
+    <div role="note" className={styles.box}>
       <span className={styles.tag}>Mock server · inbox of {email || '…'}</span>
       {!mail && <p className={styles.text}>No email yet.</p>}
       {mail && (
@@ -56,7 +56,7 @@ export function MockInbox({
           )}
         </>
       )}
-    </aside>
+    </div>
   )
 }
 
@@ -87,7 +87,7 @@ export function MockAuthenticator({
   if (!mocksOn || !state.code) return null
 
   return (
-    <aside className={styles.box}>
+    <div role="note" className={styles.box}>
       <span className={styles.tag}>Mock server · what your authenticator app shows</span>
       <p className={styles.subject}>
         <span className={styles.code}>{state.code}</span> · changes in {state.secondsLeft}s
@@ -95,6 +95,6 @@ export function MockAuthenticator({
       <button type="button" className={styles.action} onClick={() => onUseCode(state.code!)}>
         Fill it in
       </button>
-    </aside>
+    </div>
   )
 }

@@ -68,7 +68,9 @@ export default function SharedWithMePage() {
             <span role="columnheader">Your role</span>
             <span role="columnheader">Access expires</span>
             <span role="columnheader">Shared</span>
-            <span role="columnheader" aria-label="Actions" />
+            <span role="columnheader">
+              <span className="sr-only">Actions</span>
+            </span>
           </div>
           {list.map((s) => {
             const name = names.data?.[s.file.id] ?? '…'

@@ -9,7 +9,8 @@
   --ink-primary: #12140f;
   --ink-body: #33352e;
   --ink-muted: #6c6a62;
-  --ink-faint: #9a978e;
+  /* faint text darkened from figma's #9a978e: 2.6:1 on paper fails WCAG AA (book table 3-32) */
+  --ink-faint: #6e6b62;
   --surface-paper: #f2f1ee;
   --surface-white: #ffffff;
   --rule-default: #dad8d1;
@@ -29,7 +30,8 @@
   --dark-rule: #2a2e28;
   --dark-text: #f1f0ea;
   --dark-muted: #8e948b;
-  --dark-faint: #5f655d;
+  /* lifted from figma's #5f655d (3.1:1) so small mono text reaches 4.7:1 even on raised panels */
+  --dark-faint: #898f87;
   --dark-accent: #57c79e;
   --dark-accent-soft: #16261f;
   --dark-accent-line: #2c5445;

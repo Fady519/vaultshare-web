@@ -154,7 +154,9 @@ export default function AdminPage() {
             <span role="columnheader">Key</span>
             <span role="columnheader">MFA</span>
             <span role="columnheader">Last active</span>
-            <span role="columnheader" aria-label="Actions" />
+            <span role="columnheader">
+              <span className="sr-only">Actions</span>
+            </span>
           </div>
           {list.map((u) => (
             <div key={u.id} role="row" className={styles.row}>

@@ -28,7 +28,7 @@ export function MockTamper({ versionId }: { versionId: string }) {
   }
 
   return (
-    <aside className={styles.box}>
+    <div role="note" className={styles.box}>
       <span className={styles.tag}>Mock server · object storage</span>
       <p className={styles.text}>
         {tampered
@@ -38,6 +38,6 @@ export function MockTamper({ versionId }: { versionId: string }) {
       <button type="button" className={styles.action} onClick={flip}>
         {tampered ? 'Put the byte back' : 'Tamper with chunk 1'}
       </button>
-    </aside>
+    </div>
   )
 }

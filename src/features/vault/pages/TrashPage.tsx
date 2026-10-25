@@ -129,7 +129,9 @@ export default function TrashPage() {
             <span role="columnheader">Deleted by</span>
             <span role="columnheader">Deleted</span>
             <span role="columnheader">Purges in</span>
-            <span role="columnheader" aria-label="Actions" />
+            <span role="columnheader">
+              <span className="sr-only">Actions</span>
+            </span>
           </div>
           {items.map((f) => {
             const name = names.data?.[f.id] ?? '…'

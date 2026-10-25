@@ -154,7 +154,7 @@ export default function SignInPage() {
         </div>
 
         {/* figma 52: phones get told why unlocking takes a moment */}
-        <aside className={s.phoneNote}>
+        <div role="note" className={s.phoneNote}>
           <Icon name="key" className={s.phoneNoteIcon} />
           <div>
             <p className={s.phoneNoteTitle}>Slower on a phone, on purpose</p>
@@ -163,7 +163,7 @@ export default function SignInPage() {
               seconds; anyone holding a stolen copy of the database pays the same for every guess.
             </p>
           </div>
-        </aside>
+        </div>
       </form>
     </AuthSplit>
   )

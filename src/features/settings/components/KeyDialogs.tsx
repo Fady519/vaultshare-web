@@ -220,7 +220,11 @@ export function KeyDialog({ kind, onClose }: { kind: Kind; onClose: () => void }
             onChange={(e) => setConfirmText(e.target.value)}
           />
         )}
-        {busy && <p className={styles.busy}>{busy}…</p>}
+        {busy && (
+          <p className={styles.busy} role="status">
+            {busy}…
+          </p>
+        )}
         {progress && progress.total > 0 && (
           <ProgressBar value={progress.done / progress.total} label="Re-wrapping data keys" />
         )}

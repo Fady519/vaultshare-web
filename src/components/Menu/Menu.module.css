@@ -54,7 +54,11 @@
 .menu button:focus-visible {
   background: var(--surface);
   color: var(--text);
-  outline: none;
+}
+
+/* inside the menu the ring is drawn inward so it isn't clipped by the panel */
+.menu button:focus-visible {
+  outline-offset: -2px;
 }
 
 .menu button:disabled {
