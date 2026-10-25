@@ -129,13 +129,16 @@ export default function AuthenticatorSetupPage() {
 
       {error && <Callout tone="danger">{error}</Callout>}
 
-      <MockAuthenticator
-        email={email}
-        onUseCode={(c) => {
-          setCode(c)
-          confirm(c)
-        }}
-      />
+      {/* only once this page's secret exists, or it would show the code of the one it replaced */}
+      {setup && (
+        <MockAuthenticator
+          email={email}
+          onUseCode={(c) => {
+            setCode(c)
+            confirm(c)
+          }}
+        />
+      )}
     </StepCard>
   )
 }
